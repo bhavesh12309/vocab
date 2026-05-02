@@ -1,0 +1,3494 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Vocab Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:#F5F2EC; --surface:#FDFBF7; --surface2:#EFECEA;
+  --ink:#1A1714; --ink2:#6B6560; --ink3:#A8A39D;
+  --accent:#C44B2B; --accent-l:#FAF0ED; --accent-d:#7A2714;
+  --green:#3B6E52; --green-l:#EBF4EF; --green-d:#1E4D35;
+  --amber:#9B6E1A; --amber-l:#FDF3DC; --amber-d:#5C3E08;
+  --blue:#2B5D9E; --blue-l:#EBF2FC; --blue-d:#1A3A66;
+  --bdr:rgba(26,23,20,.09); --bdr2:rgba(26,23,20,.18);
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'DM Sans',sans-serif;
+  --r:12px; --r2:20px;
+  --sh:0 2px 12px rgba(0,0,0,.06);
+  --card-h:230px;
+}
+[data-theme="dark"] {
+  --bg:#111010; --surface:#1C1A18; --surface2:#252220;
+  --ink:#EDE9E3; --ink2:#958F88; --ink3:#5A5550;
+  --accent:#E06040; --accent-l:#2A1A14; --accent-d:#F4A080;
+  --green:#4D9068; --green-l:#132318; --green-d:#90D4AA;
+  --amber:#C8922A; --amber-l:#251A08; --amber-d:#F0C870;
+  --blue:#5080C8; --blue-l:#101828; --blue-d:#98C0F0;
+  --bdr:rgba(255,255,255,.07); --bdr2:rgba(255,255,255,.14);
+  --sh:0 2px 16px rgba(0,0,0,.3);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.6;transition:background .2s,color .2s}
+.wrap{max-width:800px;margin:0 auto;padding:2rem 1.5rem 5rem}
+
+/* header */
+header{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:2.5rem;flex-wrap:wrap}
+.logo{font-family:var(--serif);font-size:1.9rem;line-height:1}
+.logo em{color:var(--accent);font-style:italic}
+.hdr-r{display:flex;align-items:center;gap:8px}
+.chip{display:flex;align-items:center;gap:5px;padding:5px 12px;border:1px solid var(--bdr2);border-radius:20px;font-size:.73rem;font-weight:500;color:var(--ink2);background:var(--surface)}
+.theme-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--bdr2);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .2s}
+.theme-btn:hover{border-color:var(--ink)}
+
+/* tabs */
+.tabs{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--bdr);border-radius:calc(var(--r)+3px);padding:3px;margin-bottom:2rem}
+.tab{flex:1;padding:9px 12px;background:transparent;border:none;border-radius:var(--r);cursor:pointer;font-family:var(--sans);font-size:.81rem;font-weight:500;color:var(--ink3);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px}
+.tab.active{background:var(--surface);color:var(--ink);box-shadow:var(--sh)}
+
+/* panels */
+.panel{display:none}
+.panel.active{display:block;animation:fu .22s ease}
+@keyframes fu{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+/* forms */
+.add-form{display:flex;gap:8px;margin-bottom:1rem}
+.field{flex:1}
+.field input{width:100%;padding:10px 13px;border:1.5px solid var(--bdr2);border-radius:var(--r);background:var(--surface);color:var(--ink);font-family:var(--sans);font-size:.88rem;outline:none;transition:border-color .18s,box-shadow .18s}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(196,75,43,.1)}
+.field input::placeholder{color:var(--ink3)}
+.btn-add{padding:10px 18px;background:var(--ink);color:var(--surface);border:none;border-radius:var(--r);cursor:pointer;font-family:var(--sans);font-size:.82rem;font-weight:600;white-space:nowrap;transition:background .18s,transform .1s}
+.btn-add:hover{background:var(--accent)}
+.btn-add:active{transform:scale(.97)}
+
+/* search */
+.search-row{display:flex;gap:8px;margin-bottom:1rem}
+.sw{flex:1;position:relative}
+.sw input{width:100%;padding:9px 13px 9px 34px;border:1px solid var(--bdr2);border-radius:var(--r);background:var(--surface);color:var(--ink);font-size:.84rem;font-family:var(--sans);outline:none;transition:border-color .18s}
+.sw input:focus{border-color:var(--accent)}
+.sw-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--ink3);font-size:13px;pointer-events:none}
+.sort-btn{padding:9px 13px;border:1px solid var(--bdr2);border-radius:var(--r);background:var(--surface);color:var(--ink2);font-size:.77rem;cursor:pointer;white-space:nowrap;font-family:var(--sans);transition:all .15s}
+.sort-btn:hover{border-color:var(--ink);color:var(--ink)}
+
+/* word list */
+.word-list{display:flex;flex-direction:column;gap:5px;max-height:300px;overflow-y:auto;margin-bottom:1.25rem;padding-right:3px}
+.word-list::-webkit-scrollbar{width:3px}
+.word-list::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
+.wi{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface);border:1px solid var(--bdr);border-radius:var(--r);transition:border-color .15s,transform .15s}
+.wi:hover{border-color:var(--bdr2);transform:translateX(2px)}
+.wi-n{font-size:.68rem;color:var(--ink3);min-width:18px;text-align:right;font-weight:500}
+.wi-dot{width:7px;height:7px;border-radius:50%;background:var(--bdr2);flex-shrink:0}
+.wi-dot.hard{background:var(--accent)}
+.wi-dot.medium{background:var(--amber)}
+.wi-dot.easy{background:var(--green)}
+.wi-word{font-family:var(--serif);font-size:1rem;min-width:110px;color:var(--ink);flex-shrink:0}
+.wi-def{font-size:.79rem;color:var(--ink2);flex:1;line-height:1.35}
+.wi-del{background:none;border:none;cursor:pointer;color:var(--ink3);font-size:.95rem;padding:3px 7px;border-radius:6px;transition:all .15s}
+.wi-del:hover{color:var(--accent);background:var(--accent-l)}
+
+.empty{text-align:center;padding:3rem 2rem;color:var(--ink3);font-size:.84rem;border:1.5px dashed var(--bdr2);border-radius:var(--r2)}
+.empty-icon{font-size:2.2rem;margin-bottom:.6rem;display:block;opacity:.5}
+.empty strong{display:block;font-family:var(--serif);font-size:1.2rem;color:var(--ink2);margin-bottom:3px}
+
+.toolbar{display:flex;gap:7px;flex-wrap:wrap}
+.btn-s{padding:7px 14px;background:transparent;border:1px solid var(--bdr2);border-radius:var(--r);cursor:pointer;font-family:var(--sans);font-size:.77rem;color:var(--ink2);transition:all .15s}
+.btn-s:hover{border-color:var(--ink);color:var(--ink);background:var(--surface2)}
+.btn-s.danger:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-l)}
+
+/* progress */
+.ptrack{height:3px;background:var(--bdr2);border-radius:2px;margin-bottom:1.5rem;overflow:hidden}
+.pfill{height:100%;background:var(--ink2);border-radius:2px;transition:width .35s ease}
+
+/* flashcard stats */
+.fc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.25rem}
+.fc-stat{background:var(--surface);border:1px solid var(--bdr);border-radius:var(--r);padding:10px;text-align:center}
+.fc-stat-n{font-family:var(--serif);font-size:1.35rem;line-height:1}
+.fc-stat-l{font-size:.66rem;color:var(--ink3);margin-top:2px;text-transform:uppercase;letter-spacing:.04em}
+.fc-stat-n.e{color:var(--green)}.fc-stat-n.m{color:var(--amber)}.fc-stat-n.h{color:var(--accent)}
+
+/* flashcard */
+.fc-wrap{perspective:1400px;margin-bottom:.75rem;cursor:pointer;user-select:none}
+.fc-inner{width:100%;height:var(--card-h);position:relative;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1)}
+.fc-inner.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--r2);border:1px solid var(--bdr);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;overflow:hidden}
+.fc-front{background:var(--surface)}
+.fc-back{transform:rotateY(180deg);background:var(--ink);color:var(--bg)}
+.fc-badge{font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.65rem;opacity:.4;font-weight:600}
+.fc-word-text{font-family:var(--serif);font-size:2.1rem;text-align:center;line-height:1.25}
+.fc-back .fc-word-text{font-size:1.15rem;font-family:var(--sans);font-weight:300;line-height:1.65;opacity:.9}
+.fc-tap{font-size:.72rem;color:var(--ink3);text-align:center;margin-bottom:.75rem;letter-spacing:.03em}
+
+/* difficulty bar */
+.fc-diff{display:flex;gap:6px;margin-bottom:1.25rem;padding:10px;background:var(--surface);border:1px solid var(--bdr);border-radius:30px;align-items:center}
+.diff-lbl{font-size:.7rem;color:var(--ink3);padding:0 6px;white-space:nowrap}
+.diff-btn{flex:1;padding:8px 6px;border:1.5px solid var(--bdr2);border-radius:var(--r);background:transparent;cursor:pointer;font-family:var(--sans);font-size:.74rem;font-weight:500;transition:all .18s}
+.diff-btn.hb{color:var(--accent)}.diff-btn.hb:hover,.diff-btn.hb.on{background:var(--accent-l);border-color:var(--accent)}
+.diff-btn.mb{color:var(--amber)}.diff-btn.mb:hover,.diff-btn.mb.on{background:var(--amber-l);border-color:var(--amber)}
+.diff-btn.eb{color:var(--green)}.diff-btn.eb:hover,.diff-btn.eb.on{background:var(--green-l);border-color:var(--green)}
+
+.fc-nav{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:1rem}
+.btn-nav{padding:8px 18px;background:var(--surface);border:1px solid var(--bdr2);border-radius:30px;cursor:pointer;font-family:var(--sans);font-size:.79rem;color:var(--ink2);transition:all .18s}
+.btn-nav:hover{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.fc-ctr{font-size:.77rem;color:var(--ink3);min-width:52px;text-align:center}
+.fc-btns{display:flex;gap:7px;margin-bottom:1rem}
+.fc-btns button{flex:1;padding:9px;background:transparent;border:1px dashed var(--bdr2);border-radius:var(--r);cursor:pointer;font-family:var(--sans);font-size:.77rem;color:var(--ink3);transition:all .18s}
+.fc-btns button:hover{border-color:var(--ink2);color:var(--ink2);border-style:solid}
+
+.key-row{margin-top:1rem;padding:10px 14px;background:var(--surface);border:1px solid var(--bdr);border-radius:var(--r);font-size:.72rem;color:var(--ink3);display:flex;gap:14px;flex-wrap:wrap}
+.key-item{display:flex;align-items:center;gap:4px}
+kbd{display:inline-block;font-size:.64rem;background:var(--surface2);border:1px solid var(--bdr2);border-radius:4px;padding:1px 5px;font-family:var(--sans)}
+
+/* quiz type */
+.qt-row{display:flex;gap:5px;margin-bottom:1.5rem}
+.qt-btn{flex:1;padding:9px 8px;border:1.5px solid var(--bdr2);border-radius:var(--r);background:transparent;cursor:pointer;font-family:var(--sans);font-size:.79rem;color:var(--ink2);transition:all .18s;display:flex;align-items:center;justify-content:center;gap:5px}
+.qt-btn.active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.qt-btn:not(.active):hover{border-color:var(--ink);color:var(--ink)}
+
+/* quiz question */
+.qhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.qprog{font-size:.74rem;color:var(--ink3);font-weight:500}
+.qr-row{display:flex;align-items:center;gap:6px}
+.qscore{font-size:.74rem;font-weight:600;color:var(--ink);background:var(--surface);border:1px solid var(--bdr);padding:3px 11px;border-radius:20px}
+.streak-chip{font-size:.74rem;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--amber-l);color:var(--amber-d);border:1px solid var(--amber);display:none}
+.streak-chip.on{display:block}
+
+.qtext{font-family:var(--serif);font-size:1.45rem;color:var(--ink);margin:1rem 0 1.25rem;line-height:1.4}
+.qkw{color:var(--accent);font-style:italic}
+
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem}
+.choice{padding:13px 14px;border:1.5px solid var(--bdr2);border-radius:var(--r);background:var(--surface);color:var(--ink);font-family:var(--sans);font-size:.83rem;cursor:pointer;text-align:left;line-height:1.4;transition:all .18s;display:flex;align-items:flex-start;gap:8px}
+.choice:hover:not(:disabled){border-color:var(--ink);background:var(--surface2)}
+.choice.correct{background:var(--green-l);border-color:var(--green);color:var(--green-d)}
+.choice.wrong{background:var(--accent-l);border-color:var(--accent);color:var(--accent-d)}
+.choice:disabled{cursor:default}
+.cletter{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;min-width:20px;border-radius:50%;background:var(--surface2);border:1px solid var(--bdr2);font-size:.68rem;font-weight:600;transition:all .18s}
+.choice.correct .cletter{background:var(--green);border-color:var(--green);color:#fff}
+.choice.wrong .cletter{background:var(--accent);border-color:var(--accent);color:#fff}
+
+.fill-area{margin-bottom:1rem}
+.fill-inp{width:100%;padding:13px 15px;border:1.5px solid var(--bdr2);border-radius:var(--r);background:var(--surface);color:var(--ink);font-family:var(--serif);font-size:1.1rem;outline:none;transition:all .18s;margin-bottom:8px}
+.fill-inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(196,75,43,.1)}
+.fill-inp.ok{border-color:var(--green);background:var(--green-l);color:var(--green-d)}
+.fill-inp.no{border-color:var(--accent);background:var(--accent-l);color:var(--accent-d)}
+.fill-row{display:flex;gap:8px}
+.btn-check{padding:11px 20px;background:var(--ink);color:var(--bg);border:none;border-radius:var(--r);cursor:pointer;font-family:var(--sans);font-size:.82rem;font-weight:600;transition:background .18s}
+.btn-check:hover{background:var(--accent)}
+.btn-hint{padding:11px 14px;background:transparent;border:1.5px solid var(--bdr2);border-radius:var(--r);cursor:pointer;font-family:var(--sans);font-size:.82rem;color:var(--ink2);transition:all .18s}
+.btn-hint:hover{border-color:var(--ink);color:var(--ink)}
+
+.fb{padding:11px 14px;border-radius:var(--r);font-size:.82rem;line-height:1.5;display:none;border-left:3px solid transparent}
+.fb.show{display:block;animation:fu .2s}
+.fb.ok{background:var(--green-l);color:var(--green-d);border-color:var(--green)}
+.fb.no{background:var(--accent-l);color:var(--accent-d);border-color:var(--accent)}
+
+.btn-next{width:100%;margin-top:1rem;padding:12px;background:var(--ink);color:var(--bg);border:none;border-radius:var(--r);cursor:pointer;font-family:var(--sans);font-size:.83rem;font-weight:600;display:none;transition:background .18s}
+.btn-next:hover{background:var(--accent)}
+
+/* results */
+.res-wrap{padding:2.5rem 1rem 1.5rem;text-align:center}
+.ring-wrap{position:relative;width:136px;height:136px;margin:0 auto 1.5rem}
+.ring-svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--bdr2);stroke-width:10}
+.ring-fill{fill:none;stroke:var(--ink2);stroke-width:8;stroke-linecap:round;stroke-dasharray:339.3;stroke-dashoffset:339.3;transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)}
+.ring-txt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-pct{font-family:var(--serif);font-size:2.5rem;line-height:1}
+.ring-sub{font-size:.68rem;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+.res-msg{font-size:1rem;color:var(--ink2);margin-bottom:1.25rem;font-family:var(--serif);font-style:italic}
+.res-pills{display:flex;gap:7px;justify-content:center;margin-bottom:1.5rem;flex-wrap:wrap}
+.pill{padding:5px 16px;border-radius:20px;font-size:.77rem;font-weight:600}
+.pill.ok{background:var(--green-l);color:var(--green-d)}
+.pill.no{background:var(--accent-l);color:var(--accent-d)}
+.pill.str{background:var(--amber-l);color:var(--amber-d)}
+.res-acts{display:flex;gap:8px;justify-content:center}
+.btn-retry{padding:11px 24px;background:var(--ink);color:var(--bg);border:none;border-radius:var(--r);cursor:pointer;font-family:var(--sans);font-size:.82rem;font-weight:600;transition:background .18s}
+.btn-retry:hover{background:var(--accent)}
+.btn-review{padding:11px 18px;background:transparent;border:1.5px solid var(--bdr2);border-radius:var(--r);cursor:pointer;font-family:var(--sans);font-size:.82rem;color:var(--ink2);transition:all .18s}
+.btn-review:hover{border-color:var(--ink);color:var(--ink)}
+
+/* toast */
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(16px);background:var(--ink);color:var(--bg);padding:9px 18px;border-radius:30px;font-size:.81rem;opacity:0;transition:all .28s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── PROGRESS SYSTEM ── */
+
+
+
+
+
+
+
+
+
+
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.75rem}
+.stat-card{background:var(--surface);border:1px solid var(--bdr);border-radius:var(--r);padding:12px 14px;text-align:center}
+.stat-n{font-family:var(--serif);font-size:1.5rem;color:var(--ink);line-height:1}
+.stat-l{font-size:.68rem;color:var(--ink3);margin-top:3px;text-transform:uppercase;letter-spacing:.04em}
+
+.section-hd{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:.75rem}
+
+/* calendar heatmap */
+.cal-wrap{display:flex;gap:3px;margin-bottom:1.75rem;flex-wrap:wrap}
+.cal-day{width:18px;height:18px;border-radius:3px;background:var(--surface2);transition:background .2s;cursor:default;flex-shrink:0}
+.cal-day[title]:hover{opacity:.8}
+.cal-day.d1{background:rgba(196,75,43,.2)}
+.cal-day.d2{background:rgba(196,75,43,.4)}
+.cal-day.d3{background:rgba(196,75,43,.65)}
+.cal-day.d4{background:var(--accent)}
+
+/* chart */
+.chart-wrap{position:relative;margin-bottom:1.75rem;background:var(--surface);border:1px solid var(--bdr);border-radius:var(--r);padding:16px;min-height:140px}
+.chart-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.82rem;color:var(--ink3);font-style:italic}
+
+/* achievements */
+.achievements{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:.5rem}
+
+
+
+
+
+.ach.unlocked 
+
+.ach.unlocked 
+
+/* level-up overlay */
+
+
+
+.levelup-overlay.show 
+
+
+
+
+
+@media(max-width:520px){
+  .choices{grid-template-columns:1fr}
+  .add-form{flex-wrap:wrap}
+  .btn-add{width:100%}
+  .fc-stats{grid-template-columns:repeat(3,1fr)}
+  .qt-row{flex-wrap:wrap}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .achievements{grid-template-columns:repeat(2,1fr)}
+}
+
+/* ── WORD OF THE DAY ── */
+.wotd-card{background:var(--surface);border:1px solid var(--bdr2);color:var(--ink);border-radius:var(--r2);padding:18px 20px;margin-bottom:1.5rem;position:relative;overflow:hidden}
+.wotd-card::before{content:'';position:absolute;right:-20px;top:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.04);}
+.wotd-label{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);font-weight:600;margin-bottom:.5rem}
+.wotd-word{font-family:var(--serif);font-size:1.8rem;margin-bottom:.35rem;line-height:1.2}
+.wotd-def{font-size:.84rem;color:var(--ink2);line-height:1.55;margin-bottom:.75rem}
+.wotd-cat{font-size:.68rem;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase}
+.wotd-actions{display:flex;gap:7px;margin-top:.85rem}
+.wotd-btn{padding:6px 14px;border-radius:20px;border:1px solid var(--bdr2);background:transparent;color:var(--ink2);font-size:.75rem;cursor:pointer;font-family:var(--sans);transition:all .15s}
+.wotd-btn:hover{border-color:var(--ink);color:var(--ink)}
+
+/* ── IMPORT MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:9000;opacity:0;pointer-events:none;transition:opacity .25s;padding:1rem}
+.modal-overlay.show{opacity:1;pointer-events:all}
+.modal-box{background:var(--surface);border-radius:var(--r2);padding:1.75rem;width:100%;max-width:480px;transform:translateY(16px) scale(.97);transition:all .28s cubic-bezier(.34,1.2,.64,1)}
+.modal-overlay.show .modal-box{transform:translateY(0) scale(1)}
+.modal-title{font-family:var(--serif);font-size:1.3rem;margin-bottom:.4rem}
+.modal-sub{font-size:.8rem;color:var(--ink3);margin-bottom:1rem;line-height:1.5}
+.modal-textarea{width:100%;min-height:160px;padding:12px;border:1.5px solid var(--bdr2);border-radius:var(--r);background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:.82rem;resize:vertical;outline:none;line-height:1.6;margin-bottom:.75rem}
+.modal-textarea:focus{border-color:var(--accent)}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end}
+.import-preview{font-size:.75rem;color:var(--ink3);margin-bottom:.75rem;min-height:18px}
+.import-preview.ok{color:var(--green-d)}
+.import-preview.warn{color:var(--amber-d)}
+
+/* ── STUDY TIMER ── */
+.timer-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface);border:1px solid var(--bdr);border-radius:var(--r2);margin-bottom:1.25rem}
+.timer-display{font-family:var(--serif);font-size:1.4rem;color:var(--ink);min-width:56px;text-align:center}
+.timer-display.running{color:var(--accent)}
+.timer-lbl{font-size:.7rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em}
+.timer-btns{display:flex;gap:6px;margin-left:auto}
+.timer-btn{padding:6px 13px;border:1px solid var(--bdr2);border-radius:20px;background:transparent;cursor:pointer;font-size:.75rem;color:var(--ink2);font-family:var(--sans);transition:all .15s}
+.timer-btn:hover{border-color:var(--ink);color:var(--ink)}
+.timer-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* ── SPELLING TEST ── */
+.spell-wrap{text-align:center;padding:.5rem 0}
+.spell-word-display{font-family:var(--serif);font-size:2.2rem;margin-bottom:.5rem;color:var(--ink);min-height:3rem}
+.spell-reveal{font-size:.78rem;color:var(--ink3);margin-bottom:1.25rem;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.spell-input{width:100%;padding:14px 16px;border:2px solid var(--bdr2);border-radius:var(--r);background:var(--surface);color:var(--ink);font-family:var(--serif);font-size:1.3rem;text-align:center;outline:none;transition:all .2s;margin-bottom:10px;letter-spacing:.05em}
+.spell-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(196,75,43,.1)}
+.spell-input.correct{border-color:var(--green);background:var(--green-l);color:var(--green-d)}
+.spell-input.wrong{border-color:var(--accent);background:var(--accent-l);color:var(--accent-d)}
+.spell-def{font-size:.9rem;color:var(--ink2);margin-bottom:1.25rem;line-height:1.5;font-style:italic;background:var(--surface2);border-radius:var(--r);padding:10px 14px}
+.spell-hint-row{display:flex;gap:6px;justify-content:center;margin-bottom:1rem;flex-wrap:wrap}
+.spell-letter{width:32px;height:38px;border:1.5px solid var(--bdr2);border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:1rem;color:var(--ink);background:var(--surface);transition:all .2s}
+.spell-letter.revealed{border-color:var(--amber);background:var(--amber-l);color:var(--amber-d)}
+.spell-letter.correct{border-color:var(--green);background:var(--green-l);color:var(--green-d)}
+.spell-letter.wrong{border-color:var(--accent);background:var(--accent-l);color:var(--accent-d)}
+
+/* ── CONFETTI ── */
+.confetti-container{position:fixed;inset:0;pointer-events:none;z-index:9998;overflow:hidden}
+.conf-piece{position:absolute;width:8px;height:8px;opacity:0;animation:confFall linear forwards}
+@keyframes confFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+
+/* ── MATCH GAME ── */
+.mg-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.25rem;gap:1rem}
+.mg-title{font-family:var(--serif);font-size:1.3rem;color:var(--ink)}
+.mg-sub{font-size:.75rem;color:var(--ink3);margin-top:2px}
+.mg-meta{text-align:right}
+.mg-timer-display{font-family:var(--serif);font-size:1.6rem;color:var(--ink);line-height:1}
+.mg-score-row{font-size:.78rem;color:var(--ink3);margin-top:2px}
+.mg-board{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.25rem}
+.mg-tile{padding:12px 14px;border:2px solid var(--bdr2);border-radius:var(--r);background:var(--surface);color:var(--ink);font-family:var(--sans);font-size:.82rem;cursor:pointer;text-align:center;line-height:1.4;transition:all .2s;min-height:54px;display:flex;align-items:center;justify-content:center;user-select:none}
+.mg-tile:hover{border-color:var(--ink2);background:var(--surface2)}
+.mg-tile.word{font-family:var(--serif);font-size:.95rem;font-weight:500}
+.mg-tile.selected{border-color:var(--accent);background:var(--accent-l);color:var(--accent-d);transform:scale(1.02)}
+.mg-tile.matched{border-color:var(--green);background:var(--green-l);color:var(--green-d);cursor:default;opacity:.7}
+.mg-tile.wrong{border-color:var(--accent);background:var(--accent-l);animation:shake .35s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.mg-actions{display:flex;gap:8px;align-items:center}
+.mg-complete{text-align:center;padding:2.5rem 1rem;animation:fu .3s ease}
+.mg-complete-icon{font-size:3rem;margin-bottom:.5rem}
+.mg-complete-title{font-family:var(--serif);font-size:1.6rem;margin-bottom:.4rem}
+.mg-complete-time{font-size:1rem;color:var(--ink2);margin-bottom:.25rem}
+.mg-complete-best{font-size:.8rem;color:var(--green-d);margin-bottom:1.5rem;font-weight:600}
+
+/* ── MASTERY BARS ── */
+.mastery-bar-wrap{display:flex;align-items:center;gap:8px;min-width:80px}
+.mastery-bar{height:4px;border-radius:2px;background:var(--bdr2);flex:1;overflow:hidden}
+.mastery-fill{height:100%;border-radius:2px;transition:width .4s ease}
+.mastery-pct{font-size:.65rem;color:var(--ink3);min-width:26px;text-align:right}
+
+/* ── POMODORO ── */
+.pomo-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.pomo-preset{padding:5px 12px;border:1px solid var(--bdr2);border-radius:20px;background:transparent;cursor:pointer;font-size:.75rem;color:var(--ink2);font-family:var(--sans);transition:all .15s}
+.pomo-preset:hover,.pomo-preset.on{border-color:var(--accent);color:var(--accent);background:var(--accent-l)}
+.pomo-label{font-size:.65rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em}
+.pomo-mode{font-size:.68rem;font-weight:600;color:var(--green);background:var(--green-l);padding:2px 8px;border-radius:10px;display:none}
+.pomo-mode.show{display:inline-block}
+
+/* ── AI EXAMPLE SENTENCE ── */
+.ai-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border:1px solid var(--blue);border-radius:20px;background:var(--blue-l);color:var(--blue-d);font-size:.73rem;font-weight:500;cursor:pointer;font-family:var(--sans);transition:all .18s;margin-top:.5rem}
+.ai-btn:hover{background:var(--blue);color:#fff}
+.ai-sentence{font-style:italic;font-size:.82rem;color:var(--ink2);background:var(--surface2);border-radius:var(--r);padding:10px 13px;margin-top:.5rem;line-height:1.55;border-left:3px solid var(--blue);display:none}
+.ai-sentence.show{display:block;animation:fu .25s ease}
+.ai-loading{opacity:.5}
+
+/* ── SOUND TOGGLE ── */
+.sound-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--bdr2);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .2s}
+.sound-btn:hover{border-color:var(--ink)}
+
+/* ── WORD DETAIL MODAL ── */
+.word-detail-wrap{padding:1.5rem}
+.wd-word{font-family:var(--serif);font-size:2rem;margin-bottom:.25rem}
+.wd-def{font-size:.9rem;color:var(--ink2);margin-bottom:1rem;line-height:1.55}
+.wd-stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem}
+.wd-stat{padding:5px 14px;border-radius:20px;font-size:.75rem;font-weight:600;background:var(--surface2);color:var(--ink2)}
+.wd-stat.good{background:var(--green-l);color:var(--green-d)}
+.wd-stat.mid{background:var(--amber-l);color:var(--amber-d)}
+.wd-stat.bad{background:var(--accent-l);color:var(--accent-d)}
+
+/* ── QUIZ LENGTH SELECTOR ── */
+.ql-row{display:flex;align-items:center;gap:10px;margin-bottom:1rem;flex-wrap:wrap}
+.ql-label{font-size:.75rem;color:var(--ink3);white-space:nowrap;font-weight:500}
+.ql-btns{display:flex;gap:4px}
+.ql-btn{padding:5px 13px;border:1px solid var(--bdr2);border-radius:20px;background:transparent;cursor:pointer;font-size:.75rem;color:var(--ink2);font-family:var(--sans);transition:all .15s}
+.ql-btn:hover{border-color:var(--ink);color:var(--ink)}
+.ql-btn.active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+/* ── SETTINGS ── */
+.settings-section{background:var(--surface);border:1px solid var(--bdr);border-radius:var(--r2);padding:16px 18px;margin-bottom:1rem}
+.settings-title{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem}
+.setting-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:8px 0;border-bottom:1px solid var(--bdr)}
+.setting-row:last-child{border-bottom:none;padding-bottom:0}
+.setting-info{flex:1}
+.setting-name{font-size:.85rem;font-weight:500;color:var(--ink)}
+.setting-desc{font-size:.74rem;color:var(--ink3);margin-top:1px}
+.toggle-btn{padding:5px 14px;border-radius:20px;border:1px solid var(--bdr2);background:transparent;cursor:pointer;font-size:.75rem;font-weight:600;font-family:var(--sans);color:var(--ink2);transition:all .2s;min-width:46px}
+.toggle-btn.on{background:var(--green);border-color:var(--green);color:#fff}
+
+/* ── SCORE HISTORY TABLE ── */
+.history-table{width:100%;border-collapse:collapse;font-size:.78rem}
+.history-table th{text-align:left;padding:6px 10px;font-size:.65rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);border-bottom:1px solid var(--bdr2);font-weight:600}
+.history-table td{padding:7px 10px;border-bottom:1px solid var(--bdr);color:var(--ink2)}
+.history-table tr:last-child td{border-bottom:none}
+.history-table .score-cell{font-weight:600}
+.score-cell.hi{color:var(--green)}
+.score-cell.mid{color:var(--amber)}
+.score-cell.lo{color:var(--accent)}
+.history-empty{font-size:.8rem;color:var(--ink3);font-style:italic;padding:.5rem 0}
+
+/* ── PRONUNCIATION ── */
+.pronun-row{display:flex;align-items:center;gap:8px;margin-top:.5rem}
+.pronun-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border:1px solid var(--bdr2);border-radius:20px;background:transparent;cursor:pointer;font-size:.72rem;color:var(--ink2);font-family:var(--sans);transition:all .15s}
+.pronun-btn:hover{border-color:var(--ink);color:var(--ink)}
+.pronun-syllables{font-size:.78rem;color:var(--ink3);font-style:italic}
+.tag-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .15s;user-select:none}
+.tag-pill.active{border-color:currentColor}
+.tag-input-row{display:flex;gap:6px;margin-bottom:.75rem}
+.tag-input{flex:1;padding:7px 12px;border:1px solid var(--bdr2);border-radius:var(--r);background:var(--surface);color:var(--ink);font-size:.82rem;font-family:var(--sans);outline:none}
+.tag-input:focus{border-color:var(--accent)}
+.tags-bar{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:1rem;min-height:24px}
+.wi-tags{display:flex;gap:3px;flex-wrap:wrap;margin-left:4px}
+.wi-tag{font-size:.63rem;padding:1px 7px;border-radius:10px;font-weight:600;cursor:default}
+
+/* ── ADAPTIVE / PRACTICE MODE ── */
+.practice-header{text-align:center;padding:1.5rem 0 1rem}
+.practice-title{font-family:var(--serif);font-size:1.5rem;margin-bottom:.3rem}
+.practice-sub{font-size:.8rem;color:var(--ink3)}
+.practice-gauge{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem}
+.gauge-track{flex:1;height:8px;background:var(--bdr2);border-radius:4px;overflow:hidden}
+.gauge-fill{height:100%;border-radius:4px;transition:width .5s ease}
+.gauge-label{font-size:.72rem;color:var(--ink3);white-space:nowrap}
+.time-pressure{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:.75rem}
+.tp-bar{height:5px;border-radius:3px;background:var(--bdr2);flex:1;overflow:hidden}
+.tp-fill{height:100%;border-radius:3px;background:var(--green);transition:width .1s linear}
+.tp-fill.warn{background:var(--amber)}
+.tp-fill.danger{background:var(--accent)}
+.tp-secs{font-family:var(--serif);font-size:1rem;min-width:24px;text-align:center;color:var(--ink2)}
+
+/* ── DUEL MODE ── */
+.duel-setup{text-align:center;padding:1rem 0}
+.duel-title{font-family:var(--serif);font-size:1.4rem;margin-bottom:.5rem}
+.duel-sub{font-size:.8rem;color:var(--ink3);margin-bottom:1.5rem}
+.duel-players{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.duel-player{background:var(--surface);border:1px solid var(--bdr);border-radius:var(--r2);padding:1rem;text-align:center}
+.duel-player-name{font-size:.75rem;color:var(--ink3);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.06em}
+.duel-score-big{font-family:var(--serif);font-size:2.5rem;line-height:1}
+.duel-player.active-player{border-color:var(--accent);background:var(--accent-l)}
+.duel-player.active-player .duel-score-big{color:var(--accent)}
+.duel-turn-badge{text-align:center;font-size:.8rem;font-weight:600;color:var(--ink2);margin-bottom:1rem;padding:6px;background:var(--surface2);border-radius:var(--r)}
+.duel-results{text-align:center;padding:2rem 1rem}
+.duel-winner{font-family:var(--serif);font-size:2rem;margin-bottom:.5rem}
+.duel-final-scores{display:flex;gap:1rem;justify-content:center;margin-bottom:1.5rem;flex-wrap:wrap}
+.duel-final-card{background:var(--surface);border:1px solid var(--bdr);border-radius:var(--r);padding:10px 20px;text-align:center}
+.dfc-name{font-size:.72rem;color:var(--ink3);margin-bottom:2px}
+.dfc-score{font-family:var(--serif);font-size:1.8rem}
+.dfc-score.winner{color:var(--green)}
+
+/* ── WEAK WORDS PANEL ── */
+.weak-section{margin-bottom:1.5rem}
+.weak-word-row{display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--surface);border:1px solid var(--bdr);border-radius:var(--r);margin-bottom:5px;transition:border-color .15s}
+.weak-word-row:hover{border-color:var(--bdr2)}
+.wwr-word{font-family:var(--serif);font-size:.95rem;min-width:100px}
+.wwr-bar{flex:1;height:5px;background:var(--bdr2);border-radius:3px;overflow:hidden}
+.wwr-fill{height:100%;border-radius:3px}
+.wwr-pct{font-size:.72rem;font-weight:600;min-width:32px;text-align:right}
+.wwr-attempts{font-size:.68rem;color:var(--ink3);min-width:44px;text-align:right}
+
+/* ── REVIEW QUEUE ── */
+.review-queue-card{background:var(--surface);border:1px solid var(--bdr);border-radius:var(--r2);padding:14px 16px;margin-bottom:1rem}
+.rqc-title{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:.6rem}
+.rqc-words{display:flex;flex-wrap:wrap;gap:6px}
+.rqc-word{padding:4px 12px;border-radius:20px;font-size:.75rem;cursor:pointer;transition:all .15s}
+.rqc-word:hover{opacity:.85}
+
+@media(max-width:520px){
+  .duel-players{grid-template-columns:1fr 1fr}
+  .duel-score-big{font-size:2rem}
+}
+
+/* ── DAILY CHALLENGE ── */
+.daily-banner{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--bdr2);border-radius:var(--r2);padding:14px 18px;margin-bottom:1.25rem;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.daily-banner::after{content:'';position:absolute;right:-10px;top:-10px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.03);}
+.daily-banner:hover{opacity:.9}
+.db-icon{font-size:1.8rem;flex-shrink:0}
+.db-text{flex:1}
+.db-title{font-family:var(--serif);font-size:1rem;color:var(--ink);line-height:1.2}
+.db-sub{font-size:.72rem;color:var(--ink3);margin-top:2px}
+.db-badge{font-size:.7rem;font-weight:500;padding:3px 10px;border-radius:20px;background:var(--surface2);color:var(--ink2);border:1px solid var(--bdr2);white-space:nowrap}
+.db-badge.done{background:var(--green-l);color:var(--green-d);border-color:var(--green)}
+.db-streak{font-size:.72rem;color:var(--ink3);margin-top:3px}
+
+/* ── TYPING RACE ── */
+.race-wrap{text-align:center}
+.race-prompt{font-family:var(--serif);font-size:1.8rem;color:var(--ink);margin-bottom:.5rem}
+.race-hint{font-size:.82rem;color:var(--ink2);margin-bottom:1.25rem;background:var(--surface2);border-radius:var(--r);padding:8px 14px}
+.race-input{width:100%;padding:14px 16px;border:2px solid var(--bdr2);border-radius:var(--r);background:var(--surface);color:var(--ink);font-family:var(--serif);font-size:1.2rem;text-align:center;outline:none;transition:all .2s;letter-spacing:.06em}
+.race-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(196,75,43,.1)}
+.race-input.hit{border-color:var(--green);background:var(--green-l);animation:hitFlash .3s ease}
+.race-input.miss{border-color:var(--accent);background:var(--accent-l);animation:missShake .3s ease}
+@keyframes hitFlash{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+@keyframes missShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.race-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.race-wpm{font-family:var(--serif);font-size:1.4rem;color:var(--accent)}
+.race-wpm-label{font-size:.65rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em}
+.race-chars{font-size:.8rem;color:var(--ink2)}
+.race-result{padding:2rem;text-align:center}
+.race-result-wpm{font-family:var(--serif);font-size:3.5rem;color:var(--accent);line-height:1}
+.race-result-label{font-size:.8rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem}
+.race-result-msg{font-family:var(--serif);font-style:italic;color:var(--ink2);margin-bottom:1.5rem;font-size:1rem}
+
+100%{opacity:0;transform:translateY(-40px) scale(.9)}}
+
+/* ── NOTIFICATION DOT ── */
+.notif-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);display:none;flex-shrink:0}
+.notif-dot.show{display:block}
+
+/* ── WORD ETYMOLOGY ── */
+.etymology-row{margin-top:.5rem;padding:8px 12px;background:var(--surface2);border-radius:var(--r);border-left:3px solid var(--blue)}
+.etym-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--blue-d);font-weight:600;margin-bottom:2px}
+.etym-text{font-size:.78rem;color:var(--ink2);line-height:1.45}
+
+/* ── MATCH KEYBOARD HINTS ── */
+.mg-kb-hint{font-size:.7rem;color:var(--ink3);text-align:center;padding-top:.75rem}
+
+/* ── NOTEBOOK ── */
+.notebook-area{margin-top:.75rem}
+.notebook-textarea{width:100%;min-height:72px;padding:10px 13px;border:1.5px solid var(--bdr2);border-radius:var(--r);background:var(--surface);color:var(--ink);font-family:var(--sans);font-size:.82rem;resize:vertical;outline:none;line-height:1.6;transition:border-color .18s}
+.notebook-textarea:focus{border-color:var(--accent)}
+.notebook-save{padding:5px 14px;border:1px solid var(--bdr2);border-radius:20px;background:transparent;color:var(--ink2);font-size:.73rem;cursor:pointer;font-family:var(--sans);transition:all .15s;margin-top:5px}
+.notebook-save:hover{border-color:var(--green);color:var(--green)}
+.notebook-saved{color:var(--green)!important;border-color:var(--green)!important}
+.wi-has-note::after{content:'📝';font-size:.65rem;margin-left:4px;opacity:.6}
+
+/* ── RELATIONS (synonyms / antonyms) ── */
+.rel-section{margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--bdr)}
+.rel-title{font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);margin-bottom:.4rem}
+.rel-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:.4rem}
+.rel-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:500;border:1px solid transparent}
+.rel-chip.syn{background:var(--green-l);color:var(--green-d);border-color:var(--green)}
+.rel-chip.ant{background:var(--accent-l);color:var(--accent-d);border-color:var(--accent)}
+.rel-chip-x{opacity:.5;cursor:pointer;font-size:.8rem}
+.rel-chip-x:hover{opacity:1}
+.rel-add-row{display:flex;gap:5px;margin-top:.4rem}
+.rel-input{flex:1;padding:5px 10px;border:1px solid var(--bdr2);border-radius:var(--r);background:var(--surface);color:var(--ink);font-size:.78rem;font-family:var(--sans);outline:none}
+.rel-input:focus{border-color:var(--accent)}
+.rel-btn-syn{padding:5px 10px;border:1px solid var(--green);border-radius:var(--r);background:transparent;color:var(--green-d);font-size:.72rem;cursor:pointer;font-family:var(--sans)}
+.rel-btn-ant{padding:5px 10px;border:1px solid var(--accent);border-radius:var(--r);background:transparent;color:var(--accent-d);font-size:.72rem;cursor:pointer;font-family:var(--sans)}
+.rel-btn-syn:hover{background:var(--green-l)}
+.rel-btn-ant:hover{background:var(--accent-l)}
+
+/* ── MASTERY HEATMAP ── */
+.mastery-heatmap{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:1.5rem}
+.mh-cell{width:28px;height:28px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.55rem;color:rgba(255,255,255,.7);cursor:pointer;transition:transform .15s;position:relative}
+.mh-cell:hover{transform:scale(1.15);z-index:1}
+.mh-tooltip{position:absolute;bottom:calc(100%+5px);left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);font-size:.65rem;padding:3px 8px;border-radius:6px;white-space:nowrap;pointer-events:none;display:none;z-index:100}
+.mh-cell:hover .mh-tooltip{display:block}
+.mh-legend{display:flex;align-items:center;gap:6px;font-size:.68rem;color:var(--ink3);margin-bottom:1.5rem;flex-wrap:wrap}
+.mh-legend-swatch{width:14px;height:14px;border-radius:3px}
+
+/* ── PRINT FLASHCARDS ── */
+@media print {
+  body *{visibility:hidden}
+  #print-cards,#print-cards *{visibility:visible}
+  #print-cards{position:absolute;left:0;top:0;width:100%}
+  .pc-card{page-break-inside:avoid;border:1px solid #ccc;border-radius:8px;padding:16px;margin-bottom:12px;display:flex;gap:16px;align-items:flex-start}
+  .pc-word{font-size:18pt;font-weight:bold;min-width:140px}
+  .pc-def{font-size:11pt;color:#444}
+}
+.print-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid var(--bdr2);border-radius:var(--r);background:var(--surface);color:var(--ink2);font-size:.78rem;cursor:pointer;font-family:var(--sans);transition:all .15s}
+.print-btn:hover{border-color:var(--ink);color:var(--ink)}
+
+30%{transform:scale(1.35)}60%{transform:scale(.95)}100%{transform:scale(1)}}
+
+
+/* ── CLIPBOARD PASTE ── */
+.paste-area{border:2px dashed var(--bdr2);border-radius:var(--r2);padding:1.25rem;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:1rem}
+.paste-area:hover,.paste-area.drag-over{border-color:var(--accent);background:var(--accent-l)}
+.paste-icon{font-size:2rem;opacity:.4;display:block;margin-bottom:.4rem}
+.paste-label{font-size:.8rem;color:var(--ink3)}
+.paste-label strong{color:var(--ink2)}
+.paste-results{background:var(--surface);border:1px solid var(--bdr);border-radius:var(--r);padding:12px;margin-bottom:1rem;display:none}
+.paste-result-list{max-height:180px;overflow-y:auto;font-size:.78rem;color:var(--ink2);line-height:1.8}
+.paste-word-found{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;background:var(--surface2);margin:2px;cursor:pointer}
+.paste-word-found:hover{background:var(--green-l);color:var(--green-d)}
+.paste-word-found.selected{background:var(--green-l);color:var(--green-d)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="logo">vocab<em>builder</em></div>
+  <div class="hdr-r">
+    <div class="chip" id="wc-chip">📚 <span id="wc-n">0</span> words</div>
+    <div class="chip" id="streak-hdr" style="display:none">🔥 <span id="streak-n">0</span> streak</div>
+    <button class="sound-btn" onclick="toggleSound()" id="sound-btn" title="Toggle sounds">🔔</button>
+    <button class="theme-btn" onclick="toggleTheme()" id="tbtn">🌙</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="sw('manage')">📝 Words</button>
+  <button class="tab" onclick="sw('flash')">🃏 Cards</button>
+  <button class="tab" onclick="sw('quiz')">⚡ Quiz</button>
+  <button class="tab" onclick="sw('match')">🔗 Match</button>
+  <button class="tab" onclick="sw('progress')">📊 Stats</button>
+  <button class="tab" onclick="sw('settings')">⚙️</button>
+</div>
+
+<!-- MANAGE -->
+<div class="panel active" id="panel-manage">
+
+  <!-- Daily Challenge -->
+  <div class="daily-banner" id="daily-banner" onclick="startDailyChallenge()">
+    <div class="db-icon">🗓️</div>
+    <div class="db-text">
+      <div class="db-title">Daily Challenge</div>
+      <div class="db-sub" id="dc-sub">10 questions · all categories · earn bonus XP</div>
+      <div class="db-streak" id="dc-streak-text"></div>
+    </div>
+    <div class="db-badge" id="dc-badge">Start →</div>
+  </div>
+  <div class="wotd-card" id="wotd-card">
+    <div class="wotd-label">Word of the day</div>
+    <div class="wotd-word" id="wotd-word">—</div>
+    <div class="wotd-def" id="wotd-def">Loading…</div>
+    <div class="wotd-cat" id="wotd-cat"></div>
+    <div class="wotd-actions">
+      <button class="wotd-btn" onclick="addWotdToList()">+ Add to list</button>
+      <button class="wotd-btn" onclick="nextWotd()">Next →</button>
+    </div>
+  </div>
+
+  <div class="add-form">
+    <div class="field"><input type="text" id="inp-word" placeholder="Word or phrase" onkeydown="if(event.key==='Tab'){event.preventDefault();document.getElementById('inp-def').focus()}"/></div>
+    <div class="field"><input type="text" id="inp-def" placeholder="Definition" onkeydown="if(event.key==='Enter')addWord()"/></div>
+    <button class="btn-add" onclick="addWord()">+ Add</button>
+  </div>
+  <div class="search-row">
+    <div class="sw"><span class="sw-icon">🔍</span><input type="text" id="sinp" placeholder="Search words…" oninput="renderList()"/></div>
+    <button class="sort-btn" onclick="toggleSort()" id="sbtn">A–Z ↕</button>
+  </div>
+  <!-- Tag filters -->
+  <div class="tags-bar" id="tags-filter-bar"></div>
+  <div id="word-list" class="word-list"></div>
+  <div class="toolbar">
+    <button class="btn-s" onclick="showCatPicker()" id="btn-load-sample">Load word set ▾</button>
+    <button class="btn-s" onclick="showImportModal()">Import .txt</button>
+    <button class="btn-s" onclick="exportWords()">Export .txt</button>
+    <button class="btn-s" onclick="showPastePanel()">📋 Paste text</button>
+    <button class="btn-s danger" onclick="clearAll()">Clear all</button>
+  </div>
+  <div id="paste-panel" style="display:none;margin-top:.75rem">
+    <div class="paste-area" id="paste-drop-zone" onclick="triggerPasteRead()"
+      ondragover="event.preventDefault();this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="handlePasteDrop(event)">
+      <span class="paste-icon">📋</span>
+      <div class="paste-label"><strong>Click to paste</strong> or drop text here<br><span style="font-size:.7rem">Finds words you haven't added yet</span></div>
+    </div>
+    <div class="paste-results" id="paste-results">
+      <div style="font-size:.73rem;font-weight:600;color:var(--ink2);margin-bottom:.5rem">Tap words to select, then add them:</div>
+      <div class="paste-result-list" id="paste-result-list"></div>
+      <div style="display:flex;gap:7px;margin-top:.75rem">
+        <button class="btn-add" onclick="addSelectedPasteWords()" style="flex:1">Add selected</button>
+        <button class="btn-s" onclick="hidePastePanel()">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <div id="cat-picker" style="display:none;margin-top:10px;background:var(--surface);border:1px solid var(--bdr2);border-radius:var(--r2);padding:14px;animation:fu .18s ease">
+    <div style="font-size:.72rem;color:var(--ink3);margin-bottom:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase">Choose a category to load</div>
+    <div id="cat-btns" style="display:flex;flex-direction:column;gap:6px"></div>
+    <div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--bdr)">
+      <button class="btn-s" style="flex:1" onclick="loadAllCategories()">Load all 500+ words</button>
+      <button class="btn-s" onclick="hideCatPicker()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- FLASHCARDS -->
+<div class="panel" id="panel-flash">
+  <div id="fc-empty" class="empty" style="display:none"><span class="empty-icon">🃏</span><strong>No words yet</strong>Go to Words tab to add some.</div>
+  <div id="fc-main">
+    <!-- Study Timer -->
+    <div class="timer-bar">
+      <div>
+        <div class="timer-display" id="timer-display">00:00</div>
+        <div class="pomo-row" style="margin-top:4px">
+          <span class="pomo-label">Pomodoro:</span>
+          <button class="pomo-preset" onclick="setPomodoro(25)" data-mins="25">25m</button>
+          <button class="pomo-preset" onclick="setPomodoro(10)" data-mins="10">10m</button>
+          <button class="pomo-preset" onclick="setPomodoro(5)" data-mins="5">5m</button>
+          <span class="pomo-mode" id="pomo-mode">🍅 Focus</span>
+        </div>
+      </div>
+      <div class="timer-btns">
+        <button class="timer-btn" id="timer-start-btn" onclick="toggleTimer()">▶ Start</button>
+        <button class="timer-btn" onclick="resetTimer()">↺ Reset</button>
+      </div>
+    </div>
+    <div class="fc-stats">
+      <div class="fc-stat"><div class="fc-stat-n e" id="fse">0</div><div class="fc-stat-l">Easy</div></div>
+      <div class="fc-stat"><div class="fc-stat-n m" id="fsm">0</div><div class="fc-stat-l">Review</div></div>
+      <div class="fc-stat"><div class="fc-stat-n h" id="fsh">0</div><div class="fc-stat-l">Hard</div></div>
+    </div>
+    <div class="ptrack"><div class="pfill" id="fc-prog"></div></div>
+    <div class="fc-wrap" onclick="flipCard()">
+      <div class="fc-inner" id="fc-inner">
+        <div class="fc-face fc-front">
+          <div class="fc-badge">word</div>
+          <div class="fc-word-text" id="fc-word">—</div>
+        </div>
+        <div class="fc-face fc-back">
+          <div class="fc-badge" style="color:rgba(255,255,255,.35)">definition</div>
+          <div class="fc-word-text" id="fc-def">—</div>
+          <button class="ai-btn" id="fc-ai-btn" onclick="event.stopPropagation();loadAiSentence()" style="margin-top:.75rem">✨ Example sentence</button>
+          <div class="ai-sentence" id="fc-ai-sentence"></div>
+        </div>
+      </div>
+    </div>
+    <p class="fc-tap" id="fc-tap">tap card to reveal · space to flip</p>
+    <div class="fc-diff" id="fc-diff" style="display:none">
+      <span class="diff-lbl">How was it?</span>
+      <button class="diff-btn hb" onclick="rateDiff('hard')">😓 Hard</button>
+      <button class="diff-btn mb" onclick="rateDiff('medium')">🤔 Got it</button>
+      <button class="diff-btn eb" onclick="rateDiff('easy')">✓ Easy</button>
+    </div>
+    <div class="fc-nav">
+      <button class="btn-nav" onclick="fcMove(-1)">← prev</button>
+      <span class="fc-ctr" id="fc-ctr">1 / 1</span>
+      <button class="btn-nav" onclick="fcMove(1)">next →</button>
+    </div>
+    <div class="fc-btns">
+      <button onclick="shuffleFc()">⇄ Shuffle</button>
+      <button onclick="filterHard()">😓 Hard only</button>
+      <button onclick="resetDiff()">↺ Reset ratings</button>
+      <button onclick="printFlashcards()">🖨️ Print cards</button>
+    </div>
+    <div class="key-row">
+      <div class="key-item"><kbd>Space</kbd> flip</div>
+      <div class="key-item"><kbd>←</kbd><kbd>→</kbd> navigate</div>
+      <div class="key-item"><kbd>1</kbd> hard · <kbd>2</kbd> ok · <kbd>3</kbd> easy</div>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="panel" id="panel-quiz">
+  <div id="qz-empty" class="empty" style="display:none"><span class="empty-icon">⚡</span><strong>Need more words</strong>Add at least 4 words to take the quiz.</div>
+  <div id="qz-main">
+    <div class="qt-row">
+      <button class="qt-btn active" id="tb-mc" onclick="setType('mc')">🔤 Multiple choice</button>
+      <button class="qt-btn" id="tb-fill" onclick="setType('fill')">✏️ Fill in blank</button>
+      <button class="qt-btn" id="tb-spell" onclick="setType('spell')">🔡 Spelling</button>
+      <button class="qt-btn" id="tb-hard" onclick="setType('hard')">😓 Hard words</button>
+      <button class="qt-btn" id="tb-practice" onclick="setType('practice')">🎯 Practice</button>
+      <button class="qt-btn" id="tb-duel" onclick="setType('duel')">⚔️ Duel</button>
+      <button class="qt-btn" id="tb-race" onclick="setType('race')">🏁 Typing race</button>
+    </div>
+    <!-- Typing Race UI -->
+    <div id="race-wrap" style="display:none">
+      <div id="race-playing">
+        <div class="race-meta">
+          <div><div class="race-wpm" id="race-wpm">0</div><div class="race-wpm-label">WPM</div></div>
+          <div class="race-chars" id="race-chars">0 / 0</div>
+          <div><div class="race-wpm" id="race-timer" style="color:var(--ink2)">0:30</div><div class="race-wpm-label">Time</div></div>
+        </div>
+        <div class="ptrack"><div class="pfill" id="race-bar" style="width:0%"></div></div>
+        <div class="race-hint" id="race-hint"></div>
+        <div class="race-prompt" id="race-prompt"></div>
+        <input class="race-input" id="race-input" placeholder="Type the word…" autocomplete="off" autocorrect="off" spellcheck="false" oninput="raceInput()" onkeydown="if(event.key==='Enter')raceSubmit()"/>
+      </div>
+      <div id="race-result" class="race-result" style="display:none">
+        <div class="race-result-wpm" id="rr-wpm">0</div>
+        <div class="race-result-label">words per minute</div>
+        <div class="race-result-msg" id="rr-msg"></div>
+        <div class="res-pills" id="rr-pills"></div>
+        <button class="btn-add" style="margin-top:1rem" onclick="startRace()">Race again</button>
+      </div>
+    </div>
+    <!-- Quiz length selector -->
+    <div class="ql-row" id="ql-row">
+      <span class="ql-label">Questions:</span>
+      <div class="ql-btns">
+        <button class="ql-btn" onclick="setQuizLen(5)">5</button>
+        <button class="ql-btn active" onclick="setQuizLen(10)">10</button>
+        <button class="ql-btn" onclick="setQuizLen(20)">20</button>
+        <button class="ql-btn" onclick="setQuizLen(0)">All</button>
+      </div>
+    </div>
+    <!-- Practice mode overlay -->
+    <div id="practice-wrap" style="display:none">
+      <div class="practice-header">
+        <div class="practice-title">Adaptive Practice</div>
+        <div class="practice-sub">Harder words appear more often. Beat your accuracy!</div>
+      </div>
+      <div class="practice-gauge">
+        <span class="gauge-label" id="pg-label">0%</span>
+        <div class="gauge-track"><div class="gauge-fill" id="pg-fill" style="width:0%;background:var(--accent)"></div></div>
+        <span class="gauge-label" id="pg-q">0/20</span>
+      </div>
+      <div class="time-pressure">
+        <span class="tp-secs" id="tp-secs">10</span>
+        <div class="tp-bar"><div class="tp-fill" id="tp-fill" style="width:100%"></div></div>
+      </div>
+    </div>
+    <!-- Duel mode overlay -->
+    <div id="duel-wrap" style="display:none">
+      <div id="duel-setup-view">
+        <div class="duel-setup">
+          <div class="duel-title">⚔️ Two-Player Duel</div>
+          <div class="duel-sub">Pass the device — each player answers 10 questions. Highest score wins!</div>
+          <div class="duel-players">
+            <div class="duel-player" id="dp1"><div class="duel-player-name">Player 1</div><div class="duel-score-big" id="d1s">—</div></div>
+            <div class="duel-player" id="dp2"><div class="duel-player-name">Player 2</div><div class="duel-score-big" id="d2s">—</div></div>
+          </div>
+          <button class="btn-add" style="width:100%" onclick="startDuel()">Start Duel!</button>
+        </div>
+      </div>
+      <div id="duel-q-view" style="display:none">
+        <div class="duel-turn-badge" id="duel-turn-badge">Player 1's turn — Question 1/10</div>
+      </div>
+      <div id="duel-results-view" style="display:none">
+        <div class="duel-results">
+          <div class="duel-winner" id="duel-winner-text"></div>
+          <div class="duel-final-scores" id="duel-final-scores"></div>
+          <button class="btn-add" onclick="resetDuel()">Play again</button>
+        </div>
+      </div>
+    </div>
+    <div id="qz-res" style="display:none">
+      <div class="res-wrap">
+        <div class="ring-wrap">
+          <svg class="ring-svg" width="136" height="136" viewBox="0 0 120 120">
+            <circle class="ring-bg" cx="60" cy="60" r="54"/>
+            <circle class="ring-fill" id="ring-c" cx="60" cy="60" r="54"/>
+          </svg>
+          <div class="ring-txt"><div class="ring-pct" id="res-pct">0%</div><div class="ring-sub">score</div></div>
+        </div>
+        <div class="res-msg" id="res-msg"></div>
+        <div class="res-pills" id="res-pills"></div>
+        <div class="res-acts">
+          <button class="btn-retry" onclick="startQuiz()">Try again</button>
+          <button class="btn-review" onclick="reviewWrong()">Review wrong</button>
+        </div>
+      </div>
+    </div>
+    <div id="qz-q">
+      <div class="qhdr">
+        <span class="qprog" id="qprog">Question 1 of 10</span>
+        <div class="qr-row">
+          
+          <span class="qscore" id="qscore">0 correct</span>
+        </div>
+      </div>
+      <div class="ptrack"><div class="pfill" id="q-bar"></div></div>
+      <div class="qtext" id="qtext"></div>
+      <div id="mc-area" class="choices"></div>
+      <div id="fill-area" class="fill-area" style="display:none">
+        <input class="fill-inp" id="fill-inp" placeholder="Type the answer…" onkeydown="if(event.key==='Enter')submitFill()"/>
+        <div class="fill-row">
+          <button class="btn-check" onclick="submitFill()" id="fill-btn">Check answer</button>
+          <button class="btn-hint" onclick="showHint()" id="hint-btn">💡 Hint</button>
+        </div>
+      </div>
+      <div id="spell-area" style="display:none">
+        <div class="spell-def" id="spell-def"></div>
+        <div class="spell-hint-row" id="spell-boxes"></div>
+        <input class="spell-input" id="spell-inp" placeholder="Spell the word…" autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter')submitSpell()"/>
+        <div class="fill-row" style="justify-content:center;gap:8px">
+          <button class="btn-check" onclick="submitSpell()" id="spell-btn">Check spelling</button>
+          <button class="btn-hint" onclick="revealSpellLetter()" id="spell-hint-btn">💡 Letter hint</button>
+        </div>
+      </div>
+      <div class="fb" id="qfb"></div>
+      <button class="btn-next" id="qnext" onclick="nextQ()">Next question →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="panel" id="panel-progress">
+
+  <!-- Stats grid — clean, no hype -->
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-n" id="st-quizzes">0</div><div class="stat-l">Quizzes taken</div></div>
+    <div class="stat-card"><div class="stat-n" id="st-correct">0</div><div class="stat-l">Correct answers</div></div>
+    <div class="stat-card"><div class="stat-n" id="st-streak">0</div><div class="stat-l">Best streak</div></div>
+    <div class="stat-card"><div class="stat-n" id="st-cards">0</div><div class="stat-l">Cards studied</div></div>
+    <div class="stat-card"><div class="stat-n" id="st-acc">0%</div><div class="stat-l">Accuracy</div></div>
+    <div class="stat-card"><div class="stat-n" id="st-days">0</div><div class="stat-l">Day streak 🔥</div></div>
+  </div>
+
+  <!-- Activity heatmap -->
+  <div class="section-hd">Daily activity</div>
+  <div class="cal-wrap" id="cal-wrap"></div>
+
+  <!-- Score chart -->
+  <div class="section-hd">Recent quiz scores</div>
+  <div class="chart-wrap">
+    <canvas id="score-chart" height="120"></canvas>
+    <div class="chart-empty" id="chart-empty">Complete a quiz to see your score history</div>
+  </div>
+
+  <!-- Mastery heatmap -->
+  <div class="section-hd">Word mastery</div>
+  <div class="mh-legend">
+    <div class="mh-legend-swatch" style="background:var(--bdr2)"></div><span>Not studied</span>
+    <div class="mh-legend-swatch" style="background:var(--accent)"></div><span>0–49%</span>
+    <div class="mh-legend-swatch" style="background:var(--amber)"></div><span>50–79%</span>
+    <div class="mh-legend-swatch" style="background:var(--green)"></div><span>80–100%</span>
+  </div>
+  <div class="mastery-heatmap" id="mastery-heatmap"></div>
+
+  <!-- Weak words -->
+  <div class="section-hd">Words to work on</div>
+  <div class="weak-section" id="weak-words-section">
+    <div style="font-size:.8rem;color:var(--ink3);font-style:italic">Complete some quizzes to see results here.</div>
+  </div>
+
+  <!-- Review queue -->
+  <div class="section-hd">Review queue</div>
+  <div class="review-queue-card">
+    <div class="rqc-title">Due for review</div>
+    <div class="rqc-words" id="review-queue-words">
+      <div style="font-size:.78rem;color:var(--ink3);font-style:italic">No reviews due yet.</div>
+    </div>
+  </div>
+
+  <!-- Quiz history -->
+  <div class="section-hd" style="margin-top:1.5rem">Quiz history</div>
+  <div id="score-history-table" style="margin-bottom:1.5rem"></div>
+
+  <!-- Actions -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;padding-top:1rem;border-top:1px solid var(--bdr)">
+    <button class="btn-s" onclick="exportCSV()">Export CSV</button>
+    <button class="btn-s danger" onclick="resetProgress()">Reset stats</button>
+  </div>
+
+</div>
+<!-- MATCH GAME -->
+<div class="panel" id="panel-match">
+  <div id="mg-empty" class="empty" style="display:none">
+    <span class="empty-icon">🔗</span>
+    <strong>Need more words</strong>Add at least 4 words to play the match game.
+  </div>
+  <div id="mg-main">
+    <div class="mg-header">
+      <div>
+        <div class="mg-title">Match the pairs</div>
+        <div class="mg-sub">Tap a word, then tap its definition</div>
+      </div>
+      <div class="mg-meta">
+        <div class="mg-timer-display" id="mg-time">0:00</div>
+        <div class="mg-score-row">
+          <span id="mg-matched">0</span>/<span id="mg-total">0</span>
+        </div>
+      </div>
+    </div>
+    <div class="mg-board" id="mg-board"></div>
+    <div class="mg-kb-hint">Press <kbd style="font-size:.65rem;background:var(--surface2);border:1px solid var(--bdr2);border-radius:4px;padding:1px 5px">1–8</kbd> to select tiles by position</div>
+    <div class="mg-actions">
+      <button class="btn-s" onclick="startMatch()">↺ New game</button>
+      <button class="btn-s" id="mg-size-btn" onclick="cycleMatchSize()">6 pairs</button>
+    </div>
+    <div class="mg-complete" id="mg-complete" style="display:none">
+      <div class="mg-complete-icon">🎉</div>
+      <div class="mg-complete-title">All matched!</div>
+      <div class="mg-complete-time" id="mg-complete-time"></div>
+      <div class="mg-complete-best" id="mg-complete-best"></div>
+      <button class="btn-add" onclick="startMatch()">Play again</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="panel" id="panel-settings">
+  <div class="settings-section">
+    <div class="settings-title">Appearance</div>
+    <div class="setting-row">
+      <div class="setting-info"><div class="setting-name">Dark mode</div><div class="setting-desc">Switch between light and dark themes</div></div>
+      <button class="toggle-btn" id="dark-toggle" onclick="toggleTheme()">Off</button>
+    </div>
+    <div class="setting-row">
+      <div class="setting-info"><div class="setting-name">Sound effects</div><div class="setting-desc">Play tones on correct and incorrect answers</div></div>
+      <button class="toggle-btn" id="sound-toggle" onclick="toggleSoundSetting()">On</button>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-title">Quiz defaults</div>
+    <div class="setting-row">
+      <div class="setting-info"><div class="setting-name">Questions per quiz</div><div class="setting-desc">Default number of questions when starting a quiz</div></div>
+      <div class="ql-btns">
+        <button class="ql-btn" onclick="setQuizLen(5)">5</button>
+        <button class="ql-btn active" id="ql-active-10" onclick="setQuizLen(10)">10</button>
+        <button class="ql-btn" onclick="setQuizLen(20)">20</button>
+        <button class="ql-btn" onclick="setQuizLen(0)">All</button>
+      </div>
+    </div>
+    <div class="setting-row">
+      <div class="setting-info"><div class="setting-name">Practice timer</div><div class="setting-desc">Seconds per question in practice mode</div></div>
+      <div class="ql-btns">
+        <button class="ql-btn" onclick="setPracticeTime(5)">5s</button>
+        <button class="ql-btn active" id="pt-active-10" onclick="setPracticeTime(10)">10s</button>
+        <button class="ql-btn" onclick="setPracticeTime(15)">15s</button>
+        <button class="ql-btn" onclick="setPracticeTime(30)">30s</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-title">Data</div>
+    <div class="setting-row">
+      <div class="setting-info"><div class="setting-name">Export word list</div><div class="setting-desc">Download all your words as a text file</div></div>
+      <button class="btn-s" onclick="exportWords()">Export .txt</button>
+    </div>
+    <div class="setting-row">
+      <div class="setting-info"><div class="setting-name">Export as CSV</div><div class="setting-desc">Download words with mastery stats as spreadsheet</div></div>
+      <button class="btn-s" onclick="exportCSV()">Export .csv</button>
+    </div>
+    <div class="setting-row">
+      <div class="setting-info"><div class="setting-name">Import words</div><div class="setting-desc">Import from a text file in any format</div></div>
+      <button class="btn-s" onclick="showImportModal()">Import .txt</button>
+    </div>
+  </div>
+      <button class="btn-s" id="sf-btn" onclick="buyStreakFreeze()">Buy (100 XP)</button>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-title">Danger zone</div>
+    <div class="setting-row">
+      <div class="setting-info"><div class="setting-name">Clear all words</div><div class="setting-desc">Permanently delete your entire word list</div></div>
+      <button class="btn-s danger" onclick="clearAll()">Clear words</button>
+    </div>
+    <div class="setting-row">
+      <div class="setting-info"><div class="setting-name">Reset progress</div><div class="setting-desc">Delete all XP, streaks, and achievements</div></div>
+      <button class="btn-s danger" onclick="resetProgress()">Reset stats</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+<div class="confetti-container" id="confetti-container"></div>
+
+<!-- Word Detail Modal -->
+<div class="modal-overlay" id="word-detail-modal" onclick="if(event.target===this)closeWordDetail()">
+  <div class="modal-box" style="max-width:480px;padding:0;overflow:hidden">
+    <div class="word-detail-wrap">
+      <div class="wd-word" id="wd-word"></div>
+      <div class="wd-def" id="wd-def"></div>
+      <div class="wd-stats" id="wd-stats"></div>
+      <!-- Notebook -->
+      <div class="notebook-area">
+        <div style="font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);margin-bottom:.35rem">My notes</div>
+        <textarea class="notebook-textarea" id="wd-notes" placeholder="Add personal notes, memory tricks, example sentences…" oninput="autoSaveNote()"></textarea>
+        <button class="notebook-save" id="note-save-btn" onclick="saveNote()">Save note</button>
+      </div>
+      <!-- Relations -->
+      <div class="rel-section">
+        <div class="rel-title">Synonyms</div>
+        <div class="rel-chips" id="rel-syn-chips"></div>
+        <div class="rel-title" style="margin-top:.4rem">Antonyms</div>
+        <div class="rel-chips" id="rel-ant-chips"></div>
+        <div class="rel-add-row">
+          <input class="rel-input" id="rel-input" placeholder="Add synonym or antonym…" onkeydown="if(event.key==='Enter')addRelFromInput()"/>
+          <button class="rel-btn-syn" onclick="addRelFromInput('syn')">+ Syn</button>
+          <button class="rel-btn-ant" onclick="addRelFromInput('ant')">+ Ant</button>
+        </div>
+      </div>
+      <button class="ai-btn" id="wd-ai-btn" onclick="loadAiSentenceModal()" style="margin-top:.75rem">✨ Example sentence</button>
+      <div class="ai-sentence" id="wd-ai-sentence"></div>
+    </div>
+    <div class="modal-footer" style="border-top:1px solid var(--bdr);padding:.75rem 1.5rem">
+      <button class="btn-s" onclick="closeWordDetail()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden print container -->
+<div id="print-cards" style="display:none"></div>
+
+<!-- Import Modal -->
+<div class="modal-overlay" id="import-modal" onclick="if(event.target===this)hideImportModal()">
+  <div class="modal-box">
+    <div class="modal-title">Import words</div>
+    <div class="modal-sub">Paste words one per line. Separate word and definition with a tab, comma, or dash.<br>
+    Example: <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:.78rem">Ephemeral — Lasting a short time</code></div>
+    <textarea class="modal-textarea" id="import-text" placeholder="Ephemeral — Lasting for a very short time&#10;Lucid, Clear and easy to understand&#10;Tenacious	Holding firmly to something" oninput="previewImport()"></textarea>
+    <div class="import-preview" id="import-preview"></div>
+    <div class="modal-footer">
+      <button class="btn-s" onclick="hideImportModal()">Cancel</button>
+      <button class="btn-add" onclick="doImport()">Import words</button>
+    </div>
+  </div>
+</div>
+
+    <span class="lu-lvl" id="lu-lvl">2</span>
+    <div class="lu-sub" id="lu-sub">You reached <strong>Apprentice</strong></div>
+    <button class="btn-check" onclick="closeLevelUp()">Keep going!</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+// ── STATE ──
+let words=[], diff={}, mastery={}, fcOrder=[], fcIdx=0, fcFlipped=false;
+let qType='mc', qList=[], qIdx=0, qScore=0, qAns=false;
+let qStreak=0, qBest=0, qWrong=[];
+let sortAZ=false;
+let soundOn=true;
+
+// ── WORDS PERSISTENCE ──
+const WORDS_KEY='vocabbuilder_words_v1';
+function loadWords(){
+  try{
+    const s=localStorage.getItem(WORDS_KEY);
+    if(s){const d=JSON.parse(s);words=d.words||[];diff=d.diff||{};mastery=d.mastery||{};}
+  }catch(e){words=[];diff={};mastery={};}
+}
+loadWords();
+
+/* ── PROGRESS STATE ── */
+const STORAGE_KEY='vocabbuilder_progress_v1';
+let P = loadProgress();
+
+function loadProgress(){
+  try{
+    const s=localStorage.getItem(STORAGE_KEY);
+    if(s) return JSON.parse(s);
+  }catch(e){}
+  return {
+    quizzesTaken:0,totalCorrect:0,totalAnswered:0,
+    bestStreak:0,cardsStudied:0,
+    quizHistory:[],
+    activity:{},
+    dayStreak:0,lastActiveDate:'',
+    lastDailyChallenge:'',challengeStreak:0
+  };
+}
+function saveProgress(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(P));}catch(e){}
+}
+
+
+function getLevel(xp){
+  let cur=LEVELS[0];
+  for(const l of LEVELS){if(xp>=l.xp)cur=l;else break;}
+  return cur;
+}
+function getNextLevel(xp){
+  for(const l of LEVELS){if(xp<l.xp)return l;}
+  return null;
+}
+
+function closeLevelUp(){const el=document.getElementById('lu-overlay');if(el)el.classList.remove('show');}
+
+
+
+function checkAchievements(){}  // removed
+
+/* ── ACTIVITY TRACKING ── */
+/* ── PROGRESS UI ── */
+
+function renderCalendar(){
+  const wrap=document.getElementById('cal-wrap');
+  const days=84; // 12 weeks
+  const cells=[];
+  for(let i=days-1;i>=0;i--){
+    const d=new Date(Date.now()-i*864e5);
+    const key=d.toISOString().slice(0,10);
+    const count=P.activity[key]||0;
+    const cls=count===0?'':count<=2?'d1':count<=5?'d2':count<=10?'d3':'d4';
+    const mm=d.toLocaleString('default',{month:'short'});
+    const dd=d.getDate();
+    cells.push(`<div class="cal-day ${cls}" title="${mm} ${dd}: ${count} actions"></div>`);
+  }
+  wrap.innerHTML=cells.join('');
+}
+
+function renderScoreChart(){
+  const hist=P.quizHistory.slice(-14);
+  const empty=document.getElementById('chart-empty');
+  const canvas=document.getElementById('score-chart');
+  if(!hist.length){empty.style.display='flex';canvas.style.display='none';return;}
+  empty.style.display='none';canvas.style.display='block';
+
+  const ctx=canvas.getContext('2d');
+  const parentW=canvas.parentElement.offsetWidth||300;
+  const W=Math.max(parentW-32,200);
+  canvas.width=W;canvas.height=120;
+  ctx.clearRect(0,0,W,120);
+
+  const scores=hist.map(h=>Math.round(h.score/h.total*100));
+  const dark=document.documentElement.dataset.theme==='dark';
+  const gridColor=dark?'rgba(255,255,255,.07)':'rgba(26,23,20,.08)';
+  const textColor=dark?'#5A5550':'#A8A39D';
+  const lineColor='#C44B2B';
+  const dotColor='#C44B2B';
+  const fillColor=dark?'rgba(196,75,43,.15)':'rgba(196,75,43,.08)';
+
+  // grid lines
+  ctx.strokeStyle=gridColor;ctx.lineWidth=1;
+  [0,25,50,75,100].forEach(v=>{
+    const y=Math.round(100-v)+10;
+    ctx.beginPath();ctx.moveTo(40,y);ctx.lineTo(W-10,y);ctx.stroke();
+    ctx.fillStyle=textColor;ctx.font='10px DM Sans,sans-serif';
+    ctx.fillText(v+'%',2,y+4);
+  });
+
+  if(scores.length<2){
+    // single dot
+    const x=40+(W-50)/2;const y=100-scores[0]+10;
+    ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle=dotColor;ctx.fill();
+    return;
+  }
+
+  const step=(W-50)/(scores.length-1);
+
+  // fill
+  ctx.beginPath();
+  scores.forEach((s,i)=>{const x=40+i*step,y=100-s+10;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+  ctx.lineTo(40+(scores.length-1)*step,110);ctx.lineTo(40,110);ctx.closePath();
+  ctx.fillStyle=fillColor;ctx.fill();
+
+  // line
+  ctx.beginPath();ctx.strokeStyle=lineColor;ctx.lineWidth=2;ctx.lineJoin='round';
+  scores.forEach((s,i)=>{const x=40+i*step,y=100-s+10;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+  ctx.stroke();
+
+  // dots
+  scores.forEach((s,i)=>{
+    const x=40+i*step,y=100-s+10;
+    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);
+    ctx.fillStyle=s>=80?'#3B6E52':s>=50?'#9B6E1A':'#C44B2B';ctx.fill();
+    ctx.fillStyle=textColor;ctx.font='9px DM Sans,sans-serif';ctx.textAlign='center';
+    ctx.fillText(s+'%',x,y-7);
+  });
+}
+
+function renderAchievements(){}  // removed
+
+function resetProgress(){
+  if(!confirm('Reset all progress, XP, and achievements? This cannot be undone.'))return;
+  P=loadProgress();
+  P={xp:0,level:1,quizzesTaken:0,totalCorrect:0,totalAnswered:0,bestStreak:0,cardsStudied:0,quizHistory:[],activity:{},dayStreak:0,lastActiveDate:'',achievements:{}};
+  saveProgress();refreshProgressUI();toast('Progress reset');
+}
+
+// Patch into quiz results
+function recordQuizResult(score,total,bestStreak){
+  P.quizzesTaken++;
+  P.totalCorrect+=score;
+  P.totalAnswered+=total;
+  P.bestStreak=Math.max(P.bestStreak,bestStreak);
+  P.quizHistory.push({date:new Date().toISOString().slice(0,10),score,total});
+  if(P.quizHistory.length>50)P.quizHistory=P.quizHistory.slice(-50);
+  markActivity(total);
+  saveProgress();
+}
+
+function recordCardStudied(){
+  P.cardsStudied++;
+  markActivity(1);
+  saveProgress();
+  if(P.dayStreak>0){
+    const sh=document.getElementById('streak-hdr');
+    if(sh){sh.style.display='flex';document.getElementById('streak-n').textContent=P.dayStreak;}
+  }
+}
+
+
+const SAMPLE_CATEGORIES={
+'Advanced English':[
+  {w:'Ephemeral',d:'Lasting for a very short time; transitory'},
+  {w:'Lucid',d:'Clear and easy to understand; mentally clear'},
+  {w:'Tenacious',d:'Holding firmly to something; very persistent'},
+  {w:'Ambiguous',d:'Open to more than one interpretation; unclear'},
+  {w:'Verbose',d:'Using more words than needed; wordy'},
+  {w:'Pragmatic',d:'Dealing with things sensibly and practically'},
+  {w:'Enigmatic',d:'Difficult to interpret; mysterious and puzzling'},
+  {w:'Eloquent',d:'Fluent and persuasive in speech or writing'},
+  {w:'Resilient',d:'Able to recover quickly from difficulties'},
+  {w:'Conundrum',d:'A confusing and difficult problem or question'},
+  {w:'Serendipity',d:'The occurrence of fortunate events by chance'},
+  {w:'Melancholy',d:'A feeling of pensive sadness with no obvious cause'},
+  {w:'Abstruse',d:'Difficult to understand; obscure'},
+  {w:'Acrimonious',d:'Angry and bitter; having harsh feelings'},
+  {w:'Alacrity',d:'Brisk and cheerful readiness'},
+  {w:'Amalgamate',d:'To combine or unite to form one organization'},
+  {w:'Anachronism',d:'Something out of its proper historical time'},
+  {w:'Anathema',d:'Something or someone greatly detested or loathed'},
+  {w:'Anomalous',d:'Deviating from what is standard or expected'},
+  {w:'Antipathy',d:'A deep-seated feeling of aversion'},
+  {w:'Apocryphal',d:'Of doubtful authenticity, although widely circulated'},
+  {w:'Arcane',d:'Known only to those with special knowledge; mysterious'},
+  {w:'Arduous',d:'Involving or requiring strenuous effort; difficult'},
+  {w:'Assuage',d:'To make an unpleasant feeling less intense'},
+  {w:'Astute',d:'Having sharp insight; shrewd and sagacious'},
+  {w:'Atrophy',d:'Gradually decline in effectiveness or vigor'},
+  {w:'Augment',d:'To make something greater by adding to it'},
+  {w:'Auspicious',d:'Conducive to success; favorable'},
+  {w:'Avarice',d:'Extreme greed for wealth or material gain'},
+  {w:'Axiomatic',d:'Self-evidently true; taken for granted'},
+  {w:'Belligerent',d:'Hostile and aggressive; inclined to start quarrels'},
+  {w:'Benevolent',d:'Well-meaning and kindly; charitable'},
+  {w:'Bombastic',d:'High-sounding but with little meaning; inflated'},
+  {w:'Brusque',d:'Abrupt or offhand in manner or speech'},
+  {w:'Cacophony',d:'A harsh, discordant mixture of sounds'},
+  {w:'Callous',d:'Showing or having an insensitive disregard for others'},
+  {w:'Candor',d:'The quality of being open and honest; frankness'},
+  {w:'Capricious',d:'Given to sudden and unaccountable changes of mood'},
+  {w:'Castigate',d:'To reprimand someone severely'},
+  {w:'Caustic',d:'Sarcastic in a scathing and bitter way'},
+  {w:'Chicanery',d:'The use of trickery to achieve one\'s purpose'},
+  {w:'Circumspect',d:'Wary and unwilling to take risks; cautious'},
+  {w:'Clandestine',d:'Kept secret or done secretively'},
+  {w:'Cogent',d:'Clear, logical, and convincing'},
+  {w:'Complacent',d:'Showing uncritical satisfaction with oneself'},
+  {w:'Compunction',d:'A feeling of guilt or moral scruple'},
+  {w:'Condescending',d:'Having a patronizing sense of superiority'},
+  {w:'Conflagration',d:'An extensive, destructive fire'},
+  {w:'Consternation',d:'Feelings of anxiety or dismay; perturbation'},
+  {w:'Contentious',d:'Causing or likely to cause an argument; controversial'},
+  {w:'Contrite',d:'Feeling or expressing remorse at doing wrong'},
+  {w:'Convivial',d:'Friendly, lively, and enjoyable; sociable'},
+  {w:'Copious',d:'Abundant in supply or quantity'},
+  {w:'Covert',d:'Not openly acknowledged or displayed; secret'},
+  {w:'Craven',d:'Contemptibly lacking in courage; cowardly'},
+  {w:'Culpable',d:'Deserving blame; at fault'},
+  {w:'Cupidity',d:'Greed for money or possessions'},
+  {w:'Cursory',d:'Hasty and therefore not thorough or detailed'},
+  {w:'Dauntless',d:'Showing fearlessness and determination'},
+  {w:'Debilitate',d:'To make someone weak and infirm'},
+  {w:'Deference',d:'Humble submission and respect'},
+  {w:'Defunct',d:'No longer existing or functioning'},
+  {w:'Denigrate',d:'To criticize unfairly; disparage'},
+  {w:'Despondent',d:'In low spirits from loss of hope or courage'},
+  {w:'Dexterous',d:'Showing or having skill, especially with the hands'},
+  {w:'Diffidence',d:'Modesty or shyness resulting from a lack of self-confidence'},
+  {w:'Diligent',d:'Having or showing care and effort in work'},
+  {w:'Dissonance',d:'A lack of harmony; conflict'},
+  {w:'Dubious',d:'Hesitating or doubting; not reliable'},
+  {w:'Duplicitous',d:'Deceitful; practicing duplicity'},
+  {w:'Ebullient',d:'Cheerful and full of energy'},
+  {w:'Eclectic',d:'Deriving ideas from a broad and diverse range of sources'},
+  {w:'Efficacious',d:'Successful in producing a desired or intended result'},
+  {w:'Egregious',d:'Outstandingly bad; shocking'},
+  {w:'Elusive',d:'Difficult to find, catch, or achieve'},
+  {w:'Embroil',d:'To involve someone deeply in an argument or difficult situation'},
+  {w:'Emulate',d:'To match or surpass by imitation'},
+  {w:'Enervate',d:'To make someone feel drained of energy or vitality'},
+  {w:'Equanimity',d:'Mental calmness, especially in difficult situations'},
+  {w:'Equivocate',d:'To use ambiguous language to conceal the truth'},
+  {w:'Erudite',d:'Having or showing extensive knowledge'},
+  {w:'Esoteric',d:'Intended for or likely to be understood by only a small number'},
+  {w:'Evanescent',d:'Soon passing out of sight; memory or existence'},
+  {w:'Exacerbate',d:'To make a problem, bad situation, or negative feeling worse'},
+  {w:'Excoriate',d:'To censure or criticize severely'},
+  {w:'Exemplary',d:'Serving as a desirable model; representing the best'},
+  {w:'Exorbitant',d:'Unreasonably high; exceeding normal limits'},
+  {w:'Expedient',d:'Convenient and practical, though possibly improper'},
+  {w:'Expunge',d:'To erase or remove completely'},
+  {w:'Extraneous',d:'Irrelevant or unrelated to the subject'},
+  {w:'Exuberant',d:'Filled with lively energy and excitement'},
+  {w:'Facetious',d:'Treating serious issues with inappropriate humor'},
+  {w:'Fallacious',d:'Based on a mistaken belief; misleading'},
+  {w:'Fastidious',d:'Very attentive to accuracy and detail; very careful'},
+  {w:'Feckless',d:'Lacking initiative or strength of character'},
+  {w:'Fervent',d:'Having or displaying passionate intensity'},
+  {w:'Flagrant',d:'Conspicuously or obviously offensive'},
+  {w:'Furtive',d:'Attempting to avoid notice; secretive'},
+  {w:'Garrulous',d:'Excessively talkative, especially on trivial matters'},
+  {w:'Grandiloquent',d:'Pompous or extravagant in language or style'},
+  {w:'Gratuitous',d:'Uncalled for; lacking good reason; unwarranted'},
+  {w:'Gregarious',d:'Fond of company; sociable'},
+  {w:'Guile',d:'Sly or cunning intelligence; craftiness'},
+  {w:'Gullible',d:'Easily persuaded to believe something; credulous'},
+  {w:'Hackneyed',d:'Lacking significance through having been overused'},
+  {w:'Hapless',d:'Unfortunate; having no luck'},
+  {w:'Harbinger',d:'A person or thing that announces or signals an approach'},
+  {w:'Hegemony',d:'Leadership or dominance, especially of one country over others'},
+  {w:'Heretical',d:'Believing or practicing religious heresy; unorthodox'},
+  {w:'Histrionic',d:'Overly theatrical or melodramatic in character'},
+  {w:'Hubris',d:'Excessive pride or self-confidence'},
+  {w:'Hyperbole',d:'Exaggerated statements not meant to be taken literally'},
+  {w:'Iconoclast',d:'A person who attacks cherished beliefs or institutions'},
+  {w:'Idiosyncrasy',d:'A distinctive or peculiar feature or characteristic'},
+  {w:'Ignominious',d:'Deserving or causing public disgrace or shame'},
+  {w:'Imperturbable',d:'Unable to be upset or excited; calm'},
+  {w:'Impetuous',d:'Acting or done quickly, without thought; impulsive'},
+  {w:'Implacable',d:'Unable to be appeased or pacified; relentless'},
+  {w:'Incisive',d:'Intelligently analytical and clear-thinking'},
+  {w:'Incoherent',d:'Expressed in an unclear way; without logical connection'},
+  {w:'Incorrigible',d:'Not able to be corrected, improved, or reformed'},
+  {w:'Indolent',d:'Wanting to avoid activity; lazy'},
+  {w:'Ineffable',d:'Too great or extreme to be expressed in words'},
+  {w:'Inept',d:'Lacking skill or ability; incompetent'},
+  {w:'Inexorable',d:'Impossible to stop or prevent; continuing without mercy'},
+  {w:'Infallible',d:'Incapable of making mistakes; never wrong'},
+  {w:'Ingenuous',d:'Innocent and unsuspecting; artless'},
+  {w:'Inimical',d:'Tending to obstruct or harm; unfriendly; hostile'},
+  {w:'Insidious',d:'Proceeding in a gradual, subtle way but with harmful effects'},
+  {w:'Intransigent',d:'Unwilling to change one\'s views or agree; stubborn'},
+  {w:'Inveterate',d:'Having a habit or interest that is firmly established'},
+  {w:'Irascible',d:'Having or showing a tendency to be easily angered'},
+  {w:'Lassitude',d:'Physical or mental weariness; lack of energy'},
+  {w:'Loquacious',d:'Tending to talk a great deal; talkative'},
+  {w:'Lugubrious',d:'Looking or sounding sad and dismal'},
+  {w:'Magnanimous',d:'Very generous or forgiving; noble in spirit'},
+  {w:'Malfeasance',d:'Wrongdoing, especially by a public official'},
+  {w:'Malleable',d:'Easily influenced; capable of being shaped'},
+  {w:'Mendacious',d:'Not telling the truth; lying'},
+  {w:'Mercurial',d:'Subject to sudden changes of mood or mind; volatile'},
+  {w:'Meticulous',d:'Showing great attention to detail; very careful'},
+  {w:'Misanthrope',d:'A person who dislikes humankind in general'},
+  {w:'Mitigate',d:'To make less severe, serious, or painful'},
+  {w:'Mollify',d:'To appease the anger or anxiety of; soothe'},
+  {w:'Morose',d:'Sullen and ill-tempered; gloomy'},
+  {w:'Mundane',d:'Lacking interest or excitement; dull; ordinary'},
+  {w:'Nebulous',d:'In the form of a cloud or haze; unclear or vague'},
+  {w:'Nefarious',d:'Wicked or criminal; villainous'},
+  {w:'Nihilism',d:'The rejection of all religious and moral principles'},
+  {w:'Obdurate',d:'Stubbornly refusing to change one\'s opinion'},
+  {w:'Obfuscate',d:'To render obscure, unclear, or unintelligible'},
+  {w:'Oblique',d:'Not explicit or direct; indirect'},
+  {w:'Obsequious',d:'Obedient or attentive to an excessive degree; fawning'},
+  {w:'Obstreperous',d:'Noisy and difficult to control; unruly'},
+  {w:'Obtuse',d:'Slow to understand; lacking sharpness of intellect'},
+  {w:'Officious',d:'Assertive of authority in an annoyingly domineering way'},
+  {w:'Ominous',d:'Giving the impression that something bad will happen'},
+  {w:'Opaque',d:'Not transparent; hard to understand'},
+  {w:'Opprobrium',d:'Harsh criticism or censure; public disgrace'},
+  {w:'Ostensible',d:'Stated or appearing to be true, but not necessarily so'},
+  {w:'Ostentatious',d:'Characterized by vulgar or pretentious display'},
+  {w:'Pacifist',d:'A person who believes war is unjustifiable'},
+  {w:'Palliate',d:'To make less severe without removing the cause'},
+  {w:'Paltry',d:'Small or meager; petty and contemptible'},
+  {w:'Panacea',d:'A solution or remedy for all difficulties or diseases'},
+  {w:'Pariah',d:'An outcast; a person rejected by society'},
+  {w:'Parsimonious',d:'Very unwilling to spend money; excessively frugal'},
+  {w:'Paucity',d:'The presence of something only in small or insufficient quantities'},
+  {w:'Penchant',d:'A strong or habitual liking for something'},
+  {w:'Perfidious',d:'Deceitful and untrustworthy; treacherous'},
+  {w:'Perfunctory',d:'Carried out with minimal effort; superficial'},
+  {w:'Perspicacious',d:'Having a ready insight; shrewd'},
+  {w:'Petulant',d:'Childishly sulky or bad-tempered'},
+  {w:'Philanthropist',d:'A person who seeks to promote the welfare of others'},
+  {w:'Piquant',d:'Having a pleasantly sharp, appetizing flavor; stimulating'},
+  {w:'Platitude',d:'A remark or statement that is overused; a cliche'},
+  {w:'Plausible',d:'Seeming reasonable or probable'},
+  {w:'Poignant',d:'Evoking a keen sense of sadness or regret'},
+  {w:'Ponderous',d:'Slow and clumsy because of great weight; dull'},
+  {w:'Precipitous',d:'Dangerously high or steep; sudden or hasty'},
+  {w:'Presumptuous',d:'Failing to observe the limits of what is permitted'},
+  {w:'Prevaricate',d:'To speak or act evasively; to avoid the truth'},
+  {w:'Probity',d:'The quality of having strong moral principles; honesty'},
+  {w:'Profligate',d:'Recklessly extravagant or wasteful; licentious'},
+  {w:'Propitious',d:'Giving or indicating a good chance of success; favorable'},
+  {w:'Prosaic',d:'Having the style of prose; lacking poetic beauty; ordinary'},
+  {w:'Protracted',d:'Lasting for a long time; prolonged'},
+  {w:'Provident',d:'Making or indicating timely preparation for the future'},
+  {w:'Pugnacious',d:'Eager or quick to argue, quarrel, or fight'},
+  {w:'Querulous',d:'Complaining in a petulant or whining manner'},
+  {w:'Quixotic',d:'Exceedingly idealistic; unrealistic and impractical'},
+  {w:'Rancorous',d:'Characterized by bitterness or resentment'},
+  {w:'Recalcitrant',d:'Having an obstinately uncooperative attitude'},
+  {w:'Recondite',d:'Not known by many people; abstruse'},
+  {w:'Redolent',d:'Strongly reminiscent or suggestive of something'},
+  {w:'Refractory',d:'Stubborn or unmanageable; resistant to treatment'},
+  {w:'Remonstrate',d:'To make a forcefully reproachful protest'},
+  {w:'Reprehensible',d:'Deserving censure or condemnation; blameworthy'},
+  {w:'Repudiate',d:'To refuse to accept or be associated with; disown'},
+  {w:'Reticent',d:'Not revealing one\'s thoughts or feelings readily; reserved'},
+  {w:'Rife',d:'Full of; widespread'},
+  {w:'Sagacious',d:'Having or showing keen mental discernment; wise'},
+  {w:'Salient',d:'Most noticeable or important; prominent'},
+  {w:'Sanguine',d:'Optimistic or positive, especially in a difficult situation'},
+  {w:'Sardonic',d:'Grimly mocking or cynical'},
+  {w:'Sedulous',d:'Showing dedication and diligence; assiduous'},
+  {w:'Sycophant',d:'A person who flatters someone important to gain advantage'},
+  {w:'Taciturn',d:'Reserved or uncommunicative in speech; saying little'},
+  {w:'Tempestuous',d:'Very stormy; characterized by strong emotions'},
+  {w:'Tendentious',d:'Promoting a particular cause; biased'},
+  {w:'Terse',d:'Sparing in use of words; abrupt'},
+  {w:'Timorous',d:'Showing or suffering from nervousness or fear'},
+  {w:'Tirade',d:'A long, angry speech of criticism or accusation'},
+  {w:'Torpid',d:'Mentally or physically inactive; lethargic'},
+  {w:'Transient',d:'Lasting only for a short time; impermanent'},
+  {w:'Trepidation',d:'A feeling of fear or anxiety about something'},
+  {w:'Truculent',d:'Eager or quick to argue or fight; aggressively defiant'},
+  {w:'Turbulent',d:'Moving unsteadily or in disorder; full of conflict'},
+  {w:'Ubiquitous',d:'Present, appearing, or found everywhere'},
+  {w:'Umbrage',d:'Offense or annoyance; resentment'},
+  {w:'Unequivocal',d:'Leaving no doubt; unambiguous'},
+  {w:'Untenable',d:'Not able to be maintained or defended against attack'},
+  {w:'Vacillate',d:'To waver between different opinions or actions; be indecisive'},
+  {w:'Venerable',d:'Accorded a great deal of respect, especially because of age'},
+  {w:'Veracious',d:'Speaking or representing the truth; truthful'},
+  {w:'Vexatious',d:'Causing or tending to cause annoyance or frustration'},
+  {w:'Vilify',d:'To speak or write about in an abusively disparaging manner'},
+  {w:'Vindictive',d:'Having or showing a strong desire for revenge'},
+  {w:'Visceral',d:'Relating to deep inward feelings; instinctive'},
+  {w:'Vitriolic',d:'Filled with bitter criticism or malice'},
+  {w:'Volatile',d:'Liable to change rapidly and unpredictably; explosive'},
+  {w:'Vociferous',d:'Expressing opinions in a loud and forceful way'},
+  {w:'Wanton',d:'Deliberate and unprovoked; showing no care'},
+  {w:'Wary',d:'Feeling or showing caution about possible dangers'},
+  {w:'Whimsical',d:'Playfully quaint or fanciful; unpredictable'},
+  {w:'Zealous',d:'Having or showing great energy in pursuing a cause'},
+],
+'SAT / GRE Words':[
+  {w:'Abjure',d:'To solemnly renounce a belief or claim'},
+  {w:'Abnegate',d:'To renounce or reject something; deny oneself'},
+  {w:'Abrogate',d:'To repeal or do away with a law or agreement'},
+  {w:'Abscond',d:'To leave hurriedly and secretly to escape'},
+  {w:'Abstemious',d:'Not self-indulgent, especially with food and drink'},
+  {w:'Accrete',d:'To grow or increase by gradual accumulation'},
+  {w:'Acerbic',d:'Sharp and forthright; acid in tone or taste'},
+  {w:'Adumbrate',d:'To report or outline something in a sketchy way'},
+  {w:'Aggrandize',d:'To increase the power or wealth of; exaggerate'},
+  {w:'Allay',d:'To diminish or relieve a fear, suspicion, or worry'},
+  {w:'Alleviate',d:'To make suffering, deficiency, or a problem less severe'},
+  {w:'Alluvial',d:'Relating to sediment deposited by flowing water'},
+  {w:'Ameliorate',d:'To make something bad or unsatisfactory better'},
+  {w:'Amorphous',d:'Without a clearly defined shape or form; vague'},
+  {w:'Anachronistic',d:'Belonging or appropriate to a period other than the present'},
+  {w:'Anodyne',d:'Not likely to offend or upset anyone; painkilling'},
+  {w:'Antediluvian',d:'Of or belonging to the time before the biblical Flood; very old'},
+  {w:'Antipodal',d:'Relating to or situated on the opposite side of the earth'},
+  {w:'Aphorism',d:'A pithy observation that contains a general truth'},
+  {w:'Aplomb',d:'Self-confidence or assurance, especially in demanding situations'},
+  {w:'Apposite',d:'Apt in the circumstances or in relation to something'},
+  {w:'Approbation',d:'Approval or praise'},
+  {w:'Arabesque',d:'An ornamental design with intertwined flowing lines; elaborate'},
+  {w:'Arrant',d:'Complete, utter; used to emphasize something bad'},
+  {w:'Artless',d:'Without guile or deception; natural and simple'},
+  {w:'Ascetic',d:'Characterized by severe self-discipline and abstention'},
+  {w:'Asperity',d:'Harshness of tone or manner; roughness'},
+  {w:'Assiduous',d:'Showing great care and perseverance'},
+  {w:'Atavistic',d:'Relating to a reversion to something ancient or ancestral'},
+  {w:'Attenuate',d:'To reduce the force, effect, or value of something'},
+  {w:'Audacious',d:'Showing willingness to take surprisingly bold risks'},
+  {w:'Austere',d:'Severe or strict in manner; having no comforts'},
+  {w:'Banal',d:'So lacking in originality as to be obvious and boring'},
+  {w:'Bane',d:'A cause of great distress or annoyance'},
+  {w:'Bathetic',d:'Producing an effect of anticlimax; falsely sentimental'},
+  {w:'Bifurcate',d:'To divide into two branches or forks'},
+  {w:'Blandish',d:'To coax someone with flattery; to cajole'},
+  {w:'Boorish',d:'Rough and bad-mannered; coarse'},
+  {w:'Brackish',d:'Slightly salty, as is the sea where mixed with fresh water'},
+  {w:'Brazen',d:'Bold and without shame'},
+  {w:'Bucolic',d:'Relating to the pleasant aspects of the countryside; pastoral'},
+  {w:'Burgeon',d:'To begin to grow or increase rapidly; flourish'},
+  {w:'Byzantine',d:'Excessively complicated; characterized by scheming'},
+  {w:'Calumny',d:'The making of false and defamatory statements; slander'},
+  {w:'Canonical',d:'According to or ordered by canon law; standard'},
+  {w:'Castigate',d:'To reprimand someone severely'},
+  {w:'Categorical',d:'Unambiguously explicit and direct; absolute'},
+  {w:'Celerity',d:'Swiftness of movement; speed'},
+  {w:'Censure',d:'Express severe disapproval of; a formal statement of disapproval'},
+  {w:'Charlatan',d:'A person falsely claiming to have special knowledge or skill'},
+  {w:'Chide',d:'To scold or rebuke mildly'},
+  {w:'Circumlocution',d:'The use of many words where fewer would do'},
+  {w:'Circumvent',d:'To find a way around an obstacle; to avoid by ingenuity'},
+  {w:'Clamorous',d:'Making a loud and confused noise; vigorously insistent'},
+  {w:'Clement',d:'(Of weather) mild; merciful and lenient'},
+  {w:'Cloying',d:'Excessively sweet or sentimental; sickening'},
+  {w:'Coalesce',d:'To come together to form one mass or whole'},
+  {w:'Complaisance',d:'Willingness to please others; obligingness'},
+  {w:'Comport',d:'To behave or conduct oneself in a particular way'},
+  {w:'Concomitant',d:'Naturally accompanying or associated; an accompanying thing'},
+  {w:'Congruent',d:'In agreement or harmony; corresponding'},
+  {w:'Connive',d:'To secretly allow something unethical or illegal to occur'},
+  {w:'Consecrate',d:'To make or declare something sacred'},
+  {w:'Contiguous',d:'Sharing a common border; next or together in sequence'},
+  {w:'Contumacious',d:'Stubbornly or willfully disobedient to authority'},
+  {w:'Contumely',d:'Insolent or insulting language or treatment'},
+  {w:'Corroborate',d:'To confirm or give support to a statement or theory'},
+  {w:'Cosmopolitan',d:'Familiar with and at ease in many different countries'},
+  {w:'Covetous',d:'Having or showing a great desire to possess something'},
+  {w:'Credulous',d:'Having or showing too great a readiness to believe things'},
+  {w:'Cupidity',d:'Greed for money or possessions'},
+  {w:'Dearth',d:'A scarcity or lack of something'},
+  {w:'Debase',d:'To reduce in quality or value; to lower the moral character'},
+  {w:'Decorous',d:'In keeping with good taste and propriety; proper'},
+  {w:'Deleterious',d:'Causing harm or damage'},
+  {w:'Delineate',d:'To indicate the exact position of; describe or portray precisely'},
+  {w:'Demagogue',d:'A political leader who seeks support by appealing to prejudices'},
+  {w:'Demur',d:'To raise doubts or objections; hesitation'},
+  {w:'Denigrate',d:'To criticize unfairly; to disparage'},
+  {w:'Deplete',d:'To use up the supply or resources of'},
+  {w:'Deride',d:'To subject to contemptuous ridicule; mock'},
+  {w:'Desiccate',d:'To remove all moisture from; to dry out completely'},
+  {w:'Desultory',d:'Lacking a plan, purpose, or enthusiasm; random'},
+  {w:'Diatribe',d:'A forceful and bitter verbal attack against someone or something'},
+  {w:'Didactic',d:'Intended to teach, particularly with a moral lesson'},
+  {w:'Diffuse',d:'Spread over a wide area; not concentrated'},
+  {w:'Digress',d:'To leave the main subject temporarily in speech or writing'},
+  {w:'Dilettante',d:'A person who cultivates an area of interest superficially'},
+  {w:'Dilatory',d:'Slow to act; intended to cause delay'},
+  {w:'Disabuse',d:'To persuade someone that an idea is mistaken'},
+  {w:'Discursive',d:'Digressing from subject to subject; proceeding by reasoning'},
+  {w:'Disingenuous',d:'Not candid or sincere; falsely ingenuous'},
+  {w:'Disparity',d:'A great difference; inequality'},
+  {w:'Dissemble',d:'To conceal or disguise one\'s true motives or feelings'},
+  {w:'Dissipate',d:'To waste money, energy, or resources; to scatter or dispel'},
+  {w:'Dissonant',d:'Lacking harmony; incongruous'},
+  {w:'Distend',d:'To cause to swell from internal pressure'},
+  {w:'Divergent',d:'Tending to be different or develop in different directions'},
+  {w:'Divisive',d:'Tending to cause disagreement or hostility between people'},
+  {w:'Dogmatic',d:'Inclined to lay down principles as incontrovertibly true'},
+  {w:'Dubiety',d:'The state or quality of being doubtful; uncertainty'},
+  {w:'Ebullience',d:'The quality of being cheerful and full of energy; exuberance'},
+  {w:'Effrontery',d:'Insolent or impertinent behavior; nerve'},
+  {w:'Effulgent',d:'Radiant; shining brightly'},
+  {w:'Egotism',d:'The practice of talking and thinking about oneself excessively'},
+  {w:'Elegy',d:'A mournful poem, typically a lament for the dead'},
+  {w:'Empirical',d:'Based on observation or experience rather than theory'},
+  {w:'Encomium',d:'A speech or piece of writing that praises someone enthusiastically'},
+  {w:'Endemic',d:'Regularly found among particular people or in a certain area'},
+  {w:'Enervation',d:'A feeling of being drained of energy or vitality'},
+  {w:'Equivocal',d:'Open to more than one interpretation; uncertain'},
+  {w:'Errant',d:'Erring or straying from the correct course'},
+  {w:'Erudition',d:'The quality of having or showing great knowledge'},
+  {w:'Eulogy',d:'A speech or piece of writing in praise, especially of the deceased'},
+  {w:'Exacting',d:'Making great demands; requiring much effort or care'},
+  {w:'Exculpate',d:'To show or declare that someone is not guilty of wrongdoing'},
+  {w:'Exhaustive',d:'Examining, including, or considering all elements; thorough'},
+  {w:'Exigent',d:'Pressing; demanding; requiring immediate attention'},
+  {w:'Explicate',d:'To analyze and develop an idea or principle in detail'},
+  {w:'Expurgate',d:'To remove objectionable material from a text before publication'},
+  {w:'Extant',d:'Still in existence; surviving'},
+  {w:'Extol',d:'To praise enthusiastically'},
+  {w:'Extricate',d:'To free someone or something from a constraint or difficulty'},
+  {w:'Facile',d:'Appearing neat and comprehensive only by ignoring complications'},
+  {w:'Fatuous',d:'Silly and pointless; lacking intelligence'},
+  {w:'Feign',d:'To pretend to be affected by a feeling or illness; fake'},
+  {w:'Felicitous',d:'Well chosen or suited to the circumstances'},
+  {w:'Feral',d:'In a wild state, especially after escape from captivity'},
+  {w:'Fervid',d:'Intensely enthusiastic or passionate, especially to an excessive degree'},
+  {w:'Fetid',d:'Smelling extremely unpleasant'},
+  {w:'Fidelity',d:'Faithfulness to a person, cause, or belief; accuracy'},
+  {w:'Florid',d:'Elaborate, flowery, or excessively ornate'},
+  {w:'Foment',d:'To instigate or stir up an undesirable sentiment or course of action'},
+  {w:'Forbearance',d:'Patient restraint; tolerance'},
+  {w:'Forestall',d:'To prevent or obstruct by taking advance action'},
+  {w:'Fractious',d:'Easily irritated; difficult to control'},
+  {w:'Frugality',d:'The quality of being economical with money; thriftiness'},
+  {w:'Fulsome',d:'Complimentary or flattering to an excessive degree'},
+  {w:'Funicular',d:'Relating to a rope or its tension; a cable railway'},
+  {w:'Futile',d:'Incapable of producing any useful result; pointless'},
+  {w:'Gainsay',d:'To deny or contradict; to speak against'},
+  {w:'Gauche',d:'Lacking social grace; unsophisticated'},
+  {w:'Germane',d:'Relevant to a subject under consideration'},
+  {w:'Glacial',d:'Extremely cold or unfriendly; moving very slowly'},
+  {w:'Glib',d:'Fluent and voluble but insincere and shallow'},
+  {w:'Glut',d:'An excessively abundant supply of something'},
+  {w:'Grudging',d:'Given or allowed only reluctantly or resentfully'},
+  {w:'Harangue',d:'A lengthy and aggressive speech; to lecture at length'},
+  {w:'Hedonism',d:'The pursuit of pleasure as the highest good'},
+  {w:'Heterodox',d:'Not conforming with accepted or orthodox standards'},
+  {w:'Homogeneous',d:'Of the same kind; alike; consisting of parts that are all the same'},
+],
+'Science & Medicine':[
+  {w:'Abiogenesis',d:'The original evolution of life from inorganic matter'},
+  {w:'Abscission',d:'The natural detachment of leaves, flowers, or fruit from plants'},
+  {w:'Accretion',d:'Growth or increase by gradual accumulation of additional layers'},
+  {w:'Acidosis',d:'A condition characterized by excessive acid in body fluids'},
+  {w:'Acuity',d:'Sharpness or keenness of thought, vision, or hearing'},
+  {w:'Adipose',d:'Denoting body tissue used for the storage of fat'},
+  {w:'Adrenaline',d:'A hormone secreted in conditions of stress that increases heart rate'},
+  {w:'Aerobic',d:'Relating to or requiring free oxygen for metabolism'},
+  {w:'Aetiology',d:'The cause, set of causes, or study of the cause of a disease'},
+  {w:'Allele',d:'One of two or more alternative forms of a gene'},
+  {w:'Alveoli',d:'Tiny air sacs in the lungs where gas exchange takes place'},
+  {w:'Amino acid',d:'Organic compounds that combine to form proteins'},
+  {w:'Anaerobic',d:'Relating to metabolic processes not requiring oxygen'},
+  {w:'Anatomy',d:'The branch of science concerned with bodily structure'},
+  {w:'Angiogenesis',d:'The development of new blood vessels'},
+  {w:'Antigen',d:'A toxin or foreign substance that induces an immune response'},
+  {w:'Apoptosis',d:'The death of cells occurring as a normal controlled part of development'},
+  {w:'Artery',d:'A blood vessel that carries blood away from the heart'},
+  {w:'Assay',d:'A procedure to measure the quality or quantity of a substance'},
+  {w:'Atrophy',d:'Gradual decline in effectiveness; wasting away of a body part'},
+  {w:'Benign',d:'Not harmful to health; not cancerous'},
+  {w:'Biopsy',d:'An examination of tissue from the body to discover disease'},
+  {w:'Carcinogen',d:'A substance capable of causing cancer in living tissue'},
+  {w:'Catabolism',d:'The breakdown of complex molecules in living organisms'},
+  {w:'Catalyst',d:'A substance that increases chemical reaction rate without being consumed'},
+  {w:'Chromosome',d:'A threadlike structure of nucleic acid and protein carrying genes'},
+  {w:'Cognition',d:'The mental action or process of acquiring knowledge'},
+  {w:'Combustion',d:'The process of burning; rapid chemical combination with oxygen'},
+  {w:'Cortisol',d:'A steroid hormone released in response to stress and low blood sugar'},
+  {w:'Cytoplasm',d:'The material within a cell, excluding the nucleus'},
+  {w:'Diffusion',d:'The spreading of something widely; movement of particles from high to low concentration'},
+  {w:'Diploid',d:'Having two complete sets of chromosomes'},
+  {w:'DNA',d:'Deoxyribonucleic acid; the molecule carrying genetic information'},
+  {w:'Dopamine',d:'A neurotransmitter associated with reward and motivation'},
+  {w:'Ecology',d:'The study of relationships between organisms and their environment'},
+  {w:'Edema',d:'A condition characterized by excess watery fluid in body cavities'},
+  {w:'Electrolyte',d:'A substance that produces an electrically conducting solution'},
+  {w:'Embryo',d:'An unborn or unhatched offspring in early stages of development'},
+  {w:'Endocrine',d:'Relating to glands that secrete hormones directly into the blood'},
+  {w:'Entropy',d:'Lack of order; thermodynamic quantity representing unavailable energy'},
+  {w:'Enzyme',d:'A substance produced by living organisms that acts as a catalyst'},
+  {w:'Epidemiology',d:'The study of the distribution and determinants of diseases'},
+  {w:'Epithelium',d:'The thin tissue forming the outer layer of the body\'s surface'},
+  {w:'Etiology',d:'The cause or origin of a disease'},
+  {w:'Evolution',d:'The process by which species change over time through natural selection'},
+  {w:'Exothermic',d:'Denoting a reaction or process that releases heat energy'},
+  {w:'Fermentation',d:'The chemical breakdown of a substance by bacteria or yeast'},
+  {w:'Genome',d:'The complete set of genetic material in an organism'},
+  {w:'Genotype',d:'The genetic constitution of an individual organism'},
+  {w:'Glycolysis',d:'The breakdown of glucose by enzymes to release energy'},
+  {w:'Hemoglobin',d:'A red protein responsible for transporting oxygen in red blood cells'},
+  {w:'Histology',d:'The study of the microscopic structure of tissues'},
+  {w:'Homeostasis',d:'The tendency to maintain stable internal conditions in a living organism'},
+  {w:'Hormone',d:'A regulatory substance produced in an organism and transported in tissue fluids'},
+  {w:'Hypothesis',d:'A proposed explanation made on the basis of limited evidence'},
+  {w:'Immunology',d:'The branch of medicine studying the immune system'},
+  {w:'Inertia',d:'A tendency to do nothing or to remain unchanged; resistance to acceleration'},
+  {w:'Inoculation',d:'The introduction of a vaccine to stimulate immunity to a disease'},
+  {w:'Ion',d:'An atom or molecule with a net electric charge due to electron loss or gain'},
+  {w:'Isotope',d:'Variants of an element with different numbers of neutrons'},
+  {w:'Kinesis',d:'Movement in response to stimuli, without directional orientation'},
+  {w:'Lesion',d:'A region in an organ or tissue that has suffered damage'},
+  {w:'Lymphocyte',d:'A type of white blood cell important in the immune system'},
+  {w:'Malignant',d:'Very virulent or infectious; tending to invade normal tissue; cancerous'},
+  {w:'Meiosis',d:'Cell division producing gametes with half the chromosome number'},
+  {w:'Membrane',d:'A thin pliable layer acting as a boundary or lining in an organism'},
+  {w:'Metabolism',d:'Chemical processes occurring within a living organism to maintain life'},
+  {w:'Metastasis',d:'The development of secondary cancer in another part of the body'},
+  {w:'Mitosis',d:'Cell division resulting in two identical daughter cells'},
+  {w:'Molecule',d:'A group of atoms bonded together, representing the smallest unit of a substance'},
+  {w:'Morphology',d:'The study of the forms and structures of organisms'},
+  {w:'Mutation',d:'A change in the DNA sequence of an organism'},
+  {w:'Neuron',d:'A specialized cell that transmits nerve impulses'},
+  {w:'Neurotransmitter',d:'A chemical substance released at nerve endings to transmit impulses'},
+  {w:'Nucleus',d:'The central part of most cells containing genetic material'},
+  {w:'Oncology',d:'The study and treatment of tumors'},
+  {w:'Organelle',d:'Any of a number of organized or specialized structures within a cell'},
+  {w:'Osmosis',d:'The passage of a solvent through a membrane into a more concentrated solution'},
+  {w:'Oxidation',d:'The process of losing electrons; combination with oxygen'},
+  {w:'Pandemic',d:'A disease prevalent over a whole country or the world'},
+  {w:'Pathogen',d:'A bacterium, virus, or microorganism that can cause disease'},
+  {w:'Pathology',d:'The study of disease; the typical behavior of a disease'},
+  {w:'Peptide',d:'A short chain of amino acids linked by peptide bonds'},
+  {w:'Phenotype',d:'The observable characteristics of an organism'},
+  {w:'Photosynthesis',d:'The process by which plants use sunlight to synthesize nutrients'},
+  {w:'Physiology',d:'The branch of biology dealing with functions and activities of living organisms'},
+  {w:'Plasma',d:'The colorless fluid part of blood; ionized gas'},
+  {w:'Polymer',d:'A substance with a molecular structure consisting of many similar units'},
+  {w:'Prophylaxis',d:'Action taken to prevent disease'},
+  {w:'Proteomics',d:'The large-scale study of proteins in an organism'},
+  {w:'Radiation',d:'Energy emitted as electromagnetic waves or as moving particles'},
+  {w:'Renal',d:'Relating to the kidneys'},
+  {w:'Ribonucleic',d:'Relating to RNA; nucleic acid present in living cells'},
+  {w:'Senescence',d:'The process of deterioration with age; biological aging'},
+  {w:'Serotonin',d:'A neurotransmitter associated with mood, sleep, and appetite'},
+  {w:'Somatic',d:'Relating to the body, especially as distinct from the mind'},
+  {w:'Stem cell',d:'An undifferentiated cell capable of developing into specialized cells'},
+  {w:'Symbiosis',d:'Interaction between two different organisms living in close association'},
+  {w:'Synapse',d:'A junction between two nerve cells across which impulses pass'},
+  {w:'Taxonomy',d:'The branch of science concerned with classification of organisms'},
+  {w:'Toxicology',d:'The branch of science concerned with the nature of poisons'},
+  {w:'Transcription',d:'The process of copying a DNA sequence into RNA'},
+  {w:'Vaccine',d:'A substance used to stimulate the production of antibodies'},
+  {w:'Vascular',d:'Relating to or denoting the system of vessels conveying blood or sap'},
+  {w:'Virology',d:'The branch of science that deals with the study of viruses'},
+  {w:'Zoonosis',d:'A disease that can be transmitted from animals to humans'},
+],
+'Philosophy & Logic':[
+  {w:'A posteriori',d:'Knowledge derived from experience or empirical evidence'},
+  {w:'A priori',d:'Knowledge derived from reason alone, independent of experience'},
+  {w:'Absurdism',d:'The philosophical theory that existence is irrational and meaningless'},
+  {w:'Ad hominem',d:'Attacking the person making the argument rather than the argument itself'},
+  {w:'Aesthetics',d:'A set of principles concerned with the nature of beauty in art'},
+  {w:'Agnosticism',d:'The view that the existence of God is unknown or unknowable'},
+  {w:'Altruism',d:'Disinterested and selfless concern for the well-being of others'},
+  {w:'Anthropocentrism',d:'Regarding humankind as the central element of the universe'},
+  {w:'Antithesis',d:'A person or thing that is the direct opposite of another'},
+  {w:'Aphorism',d:'A concise statement of a principle or truth'},
+  {w:'Aristotelian',d:'Relating to Aristotle or his philosophy; empirical'},
+  {w:'Axiom',d:'A statement or proposition regarded as self-evidently true'},
+  {w:'Binary opposition',d:'A pair of opposing and mutually exclusive concepts'},
+  {w:'Categorical imperative',d:'Kant\'s ethical principle that one should act only by rules applicable to all'},
+  {w:'Cogito ergo sum',d:'Descartes\' proposition: "I think, therefore I am"'},
+  {w:'Constructivism',d:'The view that knowledge is constructed through experience'},
+  {w:'Contingency',d:'The fact of being dependent on something uncertain; a possibility'},
+  {w:'Cosmology',d:'The science of the origin and development of the universe'},
+  {w:'Counterintuitive',d:'Contrary to what common sense or intuition would suggest'},
+  {w:'Deductive',d:'Characterizing reasoning that proceeds from general to particular'},
+  {w:'Deontology',d:'An ethical theory that actions are intrinsically right or wrong'},
+  {w:'Determinism',d:'The doctrine that all events are determined by prior causes'},
+  {w:'Dialectic',d:'Inquiry into metaphysical contradictions and their solutions'},
+  {w:'Dichotomy',d:'A division or contrast between two opposite things'},
+  {w:'Dualism',d:'The theory that mind and matter are two distinct substances'},
+  {w:'Empiricism',d:'The theory that all knowledge is derived from sense experience'},
+  {w:'Epistemic',d:'Relating to knowledge or the degree of its validation'},
+  {w:'Epistemology',d:'The branch of philosophy concerned with the nature of knowledge'},
+  {w:'Equivocation',d:'The use of ambiguous language to conceal the truth'},
+  {w:'Essentialism',d:'The view that objects have essential properties necessary to identity'},
+  {w:'Existentialism',d:'The philosophy that individual existence precedes essence'},
+  {w:'Fallacy',d:'A mistaken belief; an argument based on incorrect reasoning'},
+  {w:'Fatalism',d:'The belief that all events are predetermined and inevitable'},
+  {w:'Free will',d:'The power to act without the constraint of necessity or fate'},
+  {w:'Hedonism',d:'The ethical theory that pleasure is the highest good'},
+  {w:'Hermeneutics',d:'The theory and methodology of interpreting texts and meaning'},
+  {w:'Heuristic',d:'Enabling a person to discover learning for themselves; a practical approach'},
+  {w:'Humanism',d:'A rationalist outlook centered on the capabilities of humans'},
+  {w:'Idealism',d:'The belief that reality as we can know it is mentally constructed'},
+  {w:'Inductive',d:'Using particular facts to infer a general conclusion'},
+  {w:'Inference',d:'A conclusion reached by reasoning from evidence'},
+  {w:'Instrumentalism',d:'The pragmatic view that truth is determined by practical usefulness'},
+  {w:'Intrinsic',d:'Belonging naturally; essential; inherent'},
+  {w:'Intuition',d:'The ability to understand something instinctively without conscious reasoning'},
+  {w:'Kantian',d:'Relating to the philosophy of Immanuel Kant'},
+  {w:'Logos',d:'Reason and judgment; the rational principle in the universe'},
+  {w:'Materialism',d:'The theory that physical matter is the only reality'},
+  {w:'Metaphysics',d:'The branch of philosophy dealing with the nature of existence'},
+  {w:'Monism',d:'The view that only one ultimate substance or principle exists'},
+  {w:'Moral relativism',d:'The view that moral judgments are not universally valid'},
+  {w:'Naturalism',d:'A philosophical viewpoint that everything arises from natural causes'},
+  {w:'Nihilism',d:'The rejection of all religious and moral principles; meaninglessness'},
+  {w:'Nominalism',d:'The doctrine that universals or general ideas have no independent existence'},
+  {w:'Noumenon',d:'A thing as it is in itself, as distinct from a thing as it is known'},
+  {w:'Objectivism',d:'The belief that certain things exist independently of perception'},
+  {w:'Ontology',d:'The branch of metaphysics dealing with the nature of being'},
+  {w:'Paradigm',d:'A typical example or pattern; a framework of ideas'},
+  {w:'Paradox',d:'A statement that contradicts itself yet might be true'},
+  {w:'Phenomenology',d:'The philosophical study of structures of experience and consciousness'},
+  {w:'Pluralism',d:'A theory that there is more than one basic substance or principle'},
+  {w:'Positivism',d:'The theory that knowledge can only be verified through observation'},
+  {w:'Postmodernism',d:'A late 20th-century movement skeptical of grand narratives'},
+  {w:'Pragmatism',d:'A philosophical tradition that ties meaning to practical application'},
+  {w:'Premise',d:'A previous statement serving as a basis for an argument'},
+  {w:'Rationalism',d:'The belief that reason rather than experience is the source of knowledge'},
+  {w:'Reductionism',d:'The analysis of complex phenomena in terms of simple components'},
+  {w:'Relativism',d:'The doctrine that knowledge and truth are relative to context'},
+  {w:'Rhetoric',d:'The art of effective or persuasive speaking or writing'},
+  {w:'Scholasticism',d:'The dominant theological-philosophical method of medieval universities'},
+  {w:'Skepticism',d:'A questioning attitude toward knowledge, facts, or opinions'},
+  {w:'Social contract',d:'An implicit agreement among people forming a society'},
+  {w:'Socratic',d:'Relating to Socrates or his method of questioning to draw out truth'},
+  {w:'Solipsism',d:'The view that the self is the only thing that can be known to exist'},
+  {w:'Stoicism',d:'Enduring pain without complaint; the ancient philosophy of virtue and reason'},
+  {w:'Structuralism',d:'An approach emphasizing underlying structures of thought and language'},
+  {w:'Subjective',d:'Based on personal feelings or opinions rather than external facts'},
+  {w:'Syllogism',d:'A form of reasoning in which a conclusion is drawn from two premises'},
+  {w:'Synthesis',d:'Combining elements into a new whole; opposite of analysis'},
+  {w:'Teleology',d:'The explanation of phenomena by their purpose or goal'},
+  {w:'Transcendentalism',d:'A 19th-century movement emphasizing the spiritual over the material'},
+  {w:'Utilitarianism',d:'The doctrine that actions are right if they benefit the majority'},
+  {w:'Virtue ethics',d:'An approach to ethics emphasizing character over rules'},
+  {w:'Weltanschauung',d:'A comprehensive world view or philosophy of life'},
+  {w:'Zeitgeist',d:'The defining spirit or mood of a particular period of history'},
+],
+'Business & Economics':[
+  {w:'Accrual',d:'The accumulation of something over time, especially payments'},
+  {w:'Acquisition',d:'The buying of one company by another'},
+  {w:'Amortization',d:'The process of gradually writing off the initial cost of an asset'},
+  {w:'Arbitrage',d:'The practice of buying and selling assets simultaneously for profit'},
+  {w:'Asset',d:'A useful or valuable thing; an item of property owned'},
+  {w:'Austerity',d:'Difficult economic conditions created by reducing government spending'},
+  {w:'Bailout',d:'An act of giving financial assistance to a failing business'},
+  {w:'Balance sheet',d:'A financial statement showing assets, liabilities, and equity'},
+  {w:'Bear market',d:'A stock market in which prices are falling, encouraging selling'},
+  {w:'Benchmark',d:'A standard point of reference against which performance is measured'},
+  {w:'Bull market',d:'A market in which share prices are rising, encouraging buying'},
+  {w:'Capital',d:'Wealth in the form of money or assets available for production'},
+  {w:'Capitalism',d:'An economic system based on private ownership and free markets'},
+  {w:'Cartel',d:'An association of businesses formed to regulate prices and output'},
+  {w:'Cash flow',d:'The total amount of money being transferred into and out of a business'},
+  {w:'Collateral',d:'Something pledged as security for repayment of a loan'},
+  {w:'Commodity',d:'A raw material or primary agricultural product that can be traded'},
+  {w:'Conglomerate',d:'A large corporation formed by merging distinct companies'},
+  {w:'Consumer surplus',d:'The difference between what consumers pay and what they\'d be willing to pay'},
+  {w:'Deflation',d:'A reduction of the general level of prices in an economy'},
+  {w:'Depreciation',d:'A reduction in the value of an asset over time'},
+  {w:'Derivative',d:'A financial security whose value depends on an underlying asset'},
+  {w:'Disruptive',d:'Causing radical change to an existing industry or market'},
+  {w:'Diversification',d:'Expanding into a range of different products or markets'},
+  {w:'Dividend',d:'A sum of money paid regularly by a company to its shareholders'},
+  {w:'Duopoly',d:'A market situation in which only two sellers exist'},
+  {w:'Elasticity',d:'The degree to which demand or supply responds to price change'},
+  {w:'Embargo',d:'An official ban on trade with a country'},
+  {w:'Entrepreneur',d:'A person who organizes and operates a business taking financial risks'},
+  {w:'Equilibrium',d:'A state in which opposing forces or influences are balanced'},
+  {w:'Equity',d:'The value of shares issued by a company; fairness'},
+  {w:'Externality',d:'A consequence of an activity that affects other parties without compensation'},
+  {w:'Fiduciary',d:'Involving trust, especially regarding the management of money'},
+  {w:'Fiscal',d:'Relating to government revenue, especially taxes'},
+  {w:'Fixed costs',d:'Business costs that do not change with the level of output'},
+  {w:'Franchise',d:'An authorization to sell a company\'s goods or services in a certain area'},
+  {w:'Fungible',d:'Interchangeable; able to replace or be replaced by another'},
+  {w:'GDP',d:'Gross Domestic Product; the total value of goods produced in a country'},
+  {w:'Globalization',d:'The process by which businesses develop international influence'},
+  {w:'Hedge fund',d:'A limited partnership of private investors using high-risk methods'},
+  {w:'Horizontal integration',d:'The acquisition of competitors in the same industry'},
+  {w:'Illiquid',d:'Not easily converted into cash'},
+  {w:'Imperfect competition',d:'A market structure that does not meet all conditions of perfect competition'},
+  {w:'Incentive',d:'A thing that motivates or encourages someone to do something'},
+  {w:'Inflation',d:'A general increase in prices and fall in purchasing value of money'},
+  {w:'Infrastructure',d:'Basic physical and organizational structures needed for operation'},
+  {w:'Innovation',d:'The action or process of making new ideas or products'},
+  {w:'Insolvency',d:'The state of being unable to pay debts owed'},
+  {w:'Interest rate',d:'The proportion of a loan charged as interest to the borrower'},
+  {w:'IPO',d:'Initial Public Offering; a company\'s first sale of stock to the public'},
+  {w:'Keynesian',d:'Relating to economic theories of John Maynard Keynes on demand'},
+  {w:'Laissez-faire',d:'A policy of non-interference in the activities of others; free market'},
+  {w:'Leverage',d:'Using borrowed capital to increase potential return on investment'},
+  {w:'Liability',d:'A thing for which someone is responsible; a financial obligation'},
+  {w:'Liquidity',d:'The availability of liquid assets; ease of converting to cash'},
+  {w:'Macroeconomics',d:'The part of economics concerned with large-scale economic factors'},
+  {w:'Marginal cost',d:'The cost of producing one more unit of a good'},
+  {w:'Market capitalization',d:'The total market value of a company\'s outstanding shares'},
+  {w:'Microeconomics',d:'The part of economics concerned with individual decisions'},
+  {w:'Monetarism',d:'The theory that inflation is controlled by managing money supply'},
+  {w:'Monopoly',d:'Exclusive control over a commodity or service in a market'},
+  {w:'Monopsony',d:'A market in which there is only one buyer'},
+  {w:'Mortgage',d:'A loan secured on property'},
+  {w:'Multiplier effect',d:'The effect of a change in spending on national income and output'},
+  {w:'Mutual fund',d:'An investment program funded by shareholders trading in securities'},
+  {w:'Nationalization',d:'The process of transferring private industry to state ownership'},
+  {w:'Oligopoly',d:'A state of limited competition where a few producers control a market'},
+  {w:'Opportunity cost',d:'The loss of potential gain from other alternatives when one is chosen'},
+  {w:'Portfolio',d:'A range of investments held by a person or organization'},
+  {w:'Price elasticity',d:'A measure of demand sensitivity to changes in price'},
+  {w:'Privatization',d:'The transfer of a business from public to private ownership'},
+  {w:'Productivity',d:'The effectiveness of productive effort; output per unit input'},
+  {w:'Profit margin',d:'The amount by which revenue from sales exceeds costs'},
+  {w:'Protectionism',d:'The practice of protecting domestic industries from foreign competition'},
+  {w:'Quantitative easing',d:'Increasing the money supply by buying government securities'},
+  {w:'Quota',d:'A fixed share; a limited quantity of a product allowed'},
+  {w:'Recession',d:'A period of temporary economic decline; negative GDP for two quarters'},
+  {w:'Regulation',d:'Rules maintained by an authority for controlling an activity'},
+  {w:'Revenue',d:'Income generated from normal business operations'},
+  {w:'Risk premium',d:'The return above the risk-free rate required to compensate for risk'},
+  {w:'ROI',d:'Return on Investment; the benefit relative to investment cost'},
+  {w:'Stagflation',d:'Persistent high inflation combined with high unemployment'},
+  {w:'Stakeholder',d:'A person with an interest or concern in a business'},
+  {w:'Subsidy',d:'A sum of money granted by the government to assist an industry'},
+  {w:'Supply chain',d:'The sequence of processes involved in producing and distributing goods'},
+  {w:'Tariff',d:'A tax or duty to be paid on a particular import or export'},
+  {w:'Tender',d:'An offer to supply goods or carry out work at a stated price'},
+  {w:'Trade deficit',d:'A negative balance of trade when imports exceed exports'},
+  {w:'Valuation',d:'An estimation of the worth of something'},
+  {w:'Variable costs',d:'Costs that vary directly with the level of production'},
+  {w:'Venture capital',d:'Capital invested in a project where there is risk of loss'},
+  {w:'Vertical integration',d:'Expansion into different stages of the same production process'},
+  {w:'Volatility',d:'Liability to change rapidly and unpredictably; market instability'},
+],
+};
+const SAMPLE=Object.values(SAMPLE_CATEGORIES).flat();
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function shuf(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=0|Math.random()*(i+1);[b[i],b[j]]=[b[j],b[i]];}return b;}
+function toast(m,d=2200){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),d);}
+function toggleTheme(){const h=document.documentElement,dk=h.dataset.theme==='dark';h.dataset.theme=dk?'light':'dark';document.getElementById('tbtn').textContent=dk?'🌙':'☀️';}
+function updateBadge(){document.getElementById('wc-n').textContent=words.length;}
+
+function toggleSort(){sortAZ=!sortAZ;document.getElementById('sbtn').textContent=sortAZ?'Z–A ↕':'A–Z ↕';renderList();}
+
+function addWord(){
+  const w=document.getElementById('inp-word').value.trim();
+  const d=document.getElementById('inp-def').value.trim();
+  if(!w||!d){toast('Enter both a word and definition ↑');return;}
+  if(words.find(x=>x.w.toLowerCase()===w.toLowerCase())){toast('That word already exists!');return;}
+  words.push({w,d});
+  document.getElementById('inp-word').value='';
+  document.getElementById('inp-def').value='';
+  document.getElementById('inp-word').focus();
+  saveWords();renderList();toast(`"${w}" added ✓`);
+  addXP(2,'word added');playSound('add');
+}
+
+function delWord(i){words.splice(i,1);saveWords();renderList();}
+function clearAll(){if(!words.length)return;if(!confirm('Clear all words?'))return;words=[];diff={};mastery={};saveWords();renderList();}
+
+function showCatPicker(){
+  const p=document.getElementById('cat-picker');
+  if(p.style.display==='block'){hideCatPicker();return;}
+  const cats=Object.keys(SAMPLE_CATEGORIES);
+  document.getElementById('cat-btns').innerHTML=cats.map((c,ci)=>`
+    <button class="btn-s" style="text-align:left;justify-content:space-between;display:flex;align-items:center"
+      data-cat-idx="${ci}">
+      <span>${esc(c)}</span>
+      <span style="font-size:.7rem;color:var(--ink3);margin-left:8px">${SAMPLE_CATEGORIES[c].length} words</span>
+    </button>`).join('');
+  // attach click handlers safely
+  document.querySelectorAll('#cat-btns button').forEach((btn,ci)=>{
+    btn.addEventListener('click',()=>loadCategory(cats[ci]));
+  });
+  p.style.display='block';
+}
+function hideCatPicker(){document.getElementById('cat-picker').style.display='none';}
+
+function loadCategory(cat){
+  const list=SAMPLE_CATEGORIES[cat];
+  if(!list){toast('Category not found');return;}
+  let added=0;
+  list.forEach(w=>{
+    if(!words.find(x=>x.w.toLowerCase()===w.w.toLowerCase())){words.push({w:w.w,d:w.d});added++;}
+  });
+  saveWords();renderList();hideCatPicker();
+  toast(`Added ${added} words from "${cat}" ✓`,2800);
+}
+
+function loadAllCategories(){
+  let added=0;
+  SAMPLE.forEach(w=>{
+    if(!words.find(x=>x.w.toLowerCase()===w.w.toLowerCase())){words.push({w:w.w,d:w.d});added++;}
+  });
+  saveWords();renderList();hideCatPicker();
+  toast(`Loaded ${added} words across all categories ✓`,3000);
+}
+
+function exportWords(){
+  if(!words.length){toast('No words to export');return;}
+  const a=document.createElement('a');
+  a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(words.map(w=>w.w+'\t'+w.d).join('\n'));
+  a.download='vocab-list.txt';a.click();toast('Exported ✓');
+}
+
+/* FLASHCARDS */
+function initFlash(){
+  const e=document.getElementById('fc-empty'),m=document.getElementById('fc-main');
+  if(!words.length){e.style.display='';m.style.display='none';return;}
+  e.style.display='none';m.style.display='';
+  fcOrder=shuf([...Array(words.length).keys()]);
+  fcIdx=0;fcFlipped=false;updateFcStats();renderCard();
+}
+
+function updateFcStats(){
+  let e=0,m=0,h=0;
+  words.forEach(w=>{const d=diff[w.w];if(d==='easy')e++;else if(d==='medium')m++;else if(d==='hard')h++;});
+  document.getElementById('fse').textContent=e;
+  document.getElementById('fsm').textContent=m;
+  document.getElementById('fsh').textContent=h;
+}
+
+function flipCard(){
+  const c=document.getElementById('fc-inner');
+  c.classList.toggle('flipped');
+  fcFlipped=c.classList.contains('flipped');
+  document.getElementById('fc-tap').textContent=fcFlipped?'tap to flip back':'tap card to reveal · space to flip';
+  if(fcFlipped){document.getElementById('fc-diff').style.display='flex';recordCardStudied();}
+  else document.getElementById('fc-diff').style.display='none';
+}
+
+function fcMove(d){fcIdx=(fcIdx+d+fcOrder.length)%fcOrder.length;renderCard();}
+function shuffleFc(){fcOrder=shuf(fcOrder);fcIdx=0;renderCard();toast('Deck shuffled ✓');}
+function filterHard(){
+  const hi=words.reduce((a,w,i)=>{if(diff[w.w]==='hard')a.push(i);return a;},[]);
+  if(!hi.length){toast('No hard words yet — rate some cards first');return;}
+  fcOrder=shuf(hi);fcIdx=0;renderCard();toast(`Showing ${hi.length} hard word${hi.length!==1?'s':''}`);
+}
+function resetDiff(){diff={};updateFcStats();renderList();toast('Ratings reset');}
+function rateDiff(level){
+  const w=words[fcOrder[fcIdx]];if(!w)return;
+  diff[w.w]=level;saveWords();updateFcStats();renderList();
+  document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('on'));
+  const map={hard:'hb',medium:'mb',easy:'eb'};
+  document.querySelector('.diff-btn.'+map[level]).classList.add('on');
+  setTimeout(()=>fcMove(1),380);
+}
+
+/* QUIZ */
+
+function initQuiz(){
+  const e=document.getElementById('qz-empty'),m=document.getElementById('qz-main');
+  if(words.length<4){e.style.display='';m.style.display='none';return;}
+  e.style.display='none';m.style.display='';
+  startQuiz();
+}
+
+function renderQ(){
+  if(qIdx>=qList.length){showResults();return;}
+  qAns=false;
+  const q=qList[qIdx],tot=qList.length;
+  document.getElementById('qprog').textContent=`Question ${qIdx+1} of ${tot}`;
+  document.getElementById('qscore').textContent=`${qScore} correct`;
+  document.getElementById('q-bar').style.width=`${(qIdx/tot)*100}%`;
+  document.getElementById('qfb').className='fb';
+  document.getElementById('qnext').style.display='none';
+  document.getElementById('mc-area').style.display='none';
+  document.getElementById('fill-area').style.display='none';
+  document.getElementById('spell-area').style.display='none';
+
+  if(qType==='spell'){
+    document.getElementById('qtext').textContent='Spell the word that means:';
+    document.getElementById('spell-def').textContent=q.d;
+    document.getElementById('spell-area').style.display='';
+    renderSpellBoxes(q.w);
+    const si=document.getElementById('spell-inp');
+    si.value='';si.className='spell-input';si.disabled=false;
+    document.getElementById('spell-btn').style.display='';
+    document.getElementById('spell-hint-btn').style.display='';
+    document.getElementById('spell-hint-btn').textContent='💡 Letter hint';
+    document.getElementById('spell-hint-btn').disabled=false;
+    setTimeout(()=>si.focus(),60);
+    return;
+  }
+
+  const useW=Math.random()<.5;
+  const qt=document.getElementById('qtext');
+  qt.innerHTML=useW
+    ?`What does <span class="qkw">"${esc(q.w)}"</span> mean?`
+    :`Which word matches: <span class="qkw">"${esc(q.d)}"</span>?`;
+
+  if(qType!=='fill'){
+    document.getElementById('mc-area').style.display='grid';
+    const others=shuf(words.filter(x=>x.w!==q.w)).slice(0,3);
+    const opts=shuf([...others,q]);
+    const L=['A','B','C','D'];
+    document.getElementById('mc-area').innerHTML=opts.map((o,li)=>{
+      const val=esc(useW?o.d:o.w);
+      const ir=o.w===q.w;
+      return `<button class="choice" onclick="pick(this,${ir})"><span class="cletter">${L[li]}</span>${val}</button>`;
+    }).join('');
+  } else {
+    document.getElementById('fill-area').style.display='';
+    const fi=document.getElementById('fill-inp');
+    fi.value='';fi.className='fill-inp';fi.disabled=false;
+    document.getElementById('fill-btn').style.display='';
+    document.getElementById('hint-btn').style.display='';
+    document.getElementById('hint-btn').textContent='💡 Hint';
+    document.getElementById('hint-btn').disabled=false;
+    setTimeout(()=>fi.focus(),60);
+  }
+}
+
+/* ── SPELLING TEST ── */
+let spellRevealed=[];
+function renderSpellBoxes(word){
+  spellRevealed=Array(word.length).fill(false);
+  document.getElementById('spell-boxes').innerHTML=word.split('').map((ch,i)=>
+    `<span class="spell-letter" id="sbl-${i}">${ch===' '?'&nbsp;':''}</span>`
+  ).join('');
+}
+function revealSpellLetter(){
+  const q=qList[qIdx];
+  const word=q.w;
+  const unrevealed=spellRevealed.map((r,i)=>r?-1:i).filter(i=>i>=0&&word[i]!==' ');
+  if(!unrevealed.length)return;
+  const idx=unrevealed[0|Math.random()*unrevealed.length];
+  spellRevealed[idx]=true;
+  const el=document.getElementById('sbl-'+idx);
+  if(el){el.textContent=word[idx];el.classList.add('revealed');}
+  if(unrevealed.length<=1){
+    document.getElementById('spell-hint-btn').disabled=true;
+  }
+}
+function submitSpell(){
+  if(qAns)return;
+  const si=document.getElementById('spell-inp');
+  const ans=si.value.trim();
+  if(!ans)return;
+  const q=qList[qIdx];
+  const correct=q.w;
+  qAns=true;si.disabled=true;
+  document.getElementById('spell-btn').style.display='none';
+  document.getElementById('spell-hint-btn').style.display='none';
+  const ok=ans.toLowerCase()===correct.toLowerCase();
+  si.className='spell-input '+(ok?'correct':'wrong');
+  // Light up boxes
+  correct.split('').forEach((_,i)=>{
+    const el=document.getElementById('sbl-'+i);
+    if(el){el.textContent=correct[i];el.className='spell-letter '+(ok?'correct':'wrong');}
+  });
+  if(ok){qScore++;qStreak++;if(qStreak>qBest)qBest=qStreak;if(qStreak>=3){}}
+  else{qStreak=0;qWrong.push(q);}
+  showFb(ok,ok?null:correct);
+  document.getElementById('qnext').style.display='';
+}
+
+
+function pick(el,right){
+  if(qAns)return;qAns=true;
+  document.querySelectorAll('.choice').forEach(c=>c.disabled=true);
+  if(right){
+    el.classList.add('correct');qScore++;qStreak++;
+    if(qStreak>qBest)qBest=qStreak;
+    if(qStreak>=3){}
+    showFb(true);
+  } else {
+    el.classList.add('wrong');qStreak=0;
+    const q=qList[qIdx],useW=document.getElementById('qtext').innerHTML.includes('mean?');
+    document.querySelectorAll('.choice').forEach(c=>{
+      const txt=c.textContent.slice(1).trim();
+      if(c!==el&&txt===(useW?q.d:q.w))c.classList.add('correct');
+    });
+    qWrong.push(qList[qIdx]);showFb(false);
+  }
+  document.getElementById('qnext').style.display='';
+}
+
+function submitFill(){
+  if(qAns)return;
+  const fi=document.getElementById('fill-inp');
+  const ans=fi.value.trim().toLowerCase();
+  if(!ans)return;
+  const q=qList[qIdx];
+  const useW=document.getElementById('qtext').innerHTML.includes('mean?');
+  const correct=(useW?q.d:q.w).toLowerCase();
+  qAns=true;fi.disabled=true;
+  document.getElementById('fill-btn').style.display='none';
+  document.getElementById('hint-btn').style.display='none';
+  const ok=ans===correct||(correct.includes(ans)&&ans.length>3);
+  fi.className='fill-inp '+(ok?'ok':'no');
+  if(ok){qScore++;qStreak++;if(qStreak>qBest)qBest=qStreak;if(qStreak>=3){}}
+  else{qStreak=0;qWrong.push(q);}
+  showFb(ok,useW?q.d:q.w);
+  document.getElementById('qnext').style.display='';
+}
+
+function showHint(){
+  const q=qList[qIdx];
+  const useW=document.getElementById('qtext').innerHTML.includes('mean?');
+  const ans=useW?q.d:q.w;
+  const hint=ans[0]+'_'.repeat(Math.max(ans.length-2,1))+ans[ans.length-1];
+  const hb=document.getElementById('hint-btn');
+  hb.textContent=`💡 ${hint}`;hb.disabled=true;
+}
+
+function showFb(ok,ans){
+  const fb=document.getElementById('qfb');
+  fb.className='fb show '+(ok?'ok':'no');
+  const qok=['Correct!','Nailed it!','Nice work!','That\'s right!','Excellent!'];
+  const qno=['Not quite.','Almost!','Keep going.','Not this time.'];
+  const q=ok?qok[0|Math.random()*qok.length]:qno[0|Math.random()*qno.length];
+  fb.textContent=ok?q:q+' Answer: '+(ans||'');
+}
+
+function nextQ(){qIdx++;renderQ();}
+
+function reviewWrong(){
+  if(!qWrong.length){toast('No wrong answers to review!');return;}
+  qList=[...qWrong];qIdx=0;qScore=0;qAns=false;qStreak=0;qWrong=[];
+  document.getElementById('qz-res').style.display='none';
+  document.getElementById('qz-q').style.display='';
+  
+  renderQ();toast(`Reviewing ${qList.length} missed word${qList.length!==1?'s':''}`);
+}
+
+/* ── SOUND ── */
+let _audioCtx=null;
+function getAudioCtx(){if(!_audioCtx)_audioCtx=new(window.AudioContext||window.webkitAudioContext)();return _audioCtx;}
+function playSound(type){
+  if(!soundOn)return;
+  try{
+    const ctx=getAudioCtx();const osc=ctx.createOscillator();const gain=ctx.createGain();
+    osc.connect(gain);gain.connect(ctx.destination);const now=ctx.currentTime;
+    if(type==='correct'){osc.frequency.setValueAtTime(523,now);osc.frequency.setValueAtTime(659,now+.1);gain.gain.setValueAtTime(.15,now);gain.gain.exponentialRampToValueAtTime(.001,now+.35);}
+    else if(type==='wrong'){osc.frequency.setValueAtTime(200,now);osc.type='square';gain.gain.setValueAtTime(.1,now);gain.gain.exponentialRampToValueAtTime(.001,now+.28);}
+    else if(type==='add'){osc.frequency.setValueAtTime(440,now);gain.gain.setValueAtTime(.08,now);gain.gain.exponentialRampToValueAtTime(.001,now+.18);}
+    else if(type==='complete'){
+      [523,659,784].forEach((f,i)=>{const o2=ctx.createOscillator();const g2=ctx.createGain();o2.connect(g2);g2.connect(ctx.destination);o2.frequency.value=f;g2.gain.setValueAtTime(.15,now+i*.12);g2.gain.exponentialRampToValueAtTime(.001,now+i*.12+.4);o2.start(now+i*.12);o2.stop(now+i*.12+.5);});return;
+    }
+    osc.type='sine';osc.start(now);osc.stop(now+.5);
+  }catch(e){}
+}
+function toggleSound(){
+  soundOn=!soundOn;
+  document.getElementById('sound-btn').textContent=soundOn?'🔔':'🔕';
+  toast(soundOn?'Sounds on':'Sounds off');
+}
+
+/* ── MASTERY TRACKING ── */
+function recordMastery(word,correct){
+  if(!mastery[word])mastery[word]={c:0,a:0};
+  mastery[word].a++;if(correct)mastery[word].c++;
+  saveWords();
+}
+
+/* ── WORD DETAIL MODAL ── */
+let detailWordIdx=-1;
+function closeWordDetail(){document.getElementById('word-detail-modal').classList.remove('show');}
+
+/* ── AI EXAMPLE SENTENCES ── */
+async function callAI(word,def,btnEl,boxEl){
+  btnEl.textContent='⏳ Loading…';btnEl.disabled=true;
+  boxEl.classList.remove('show');
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:100,
+        messages:[{role:'user',content:`Write ONE vivid, memorable example sentence using "${word}" (meaning: ${def}). Reply with only the sentence.`}]})});
+    const data=await resp.json();
+    boxEl.textContent=data.content?.[0]?.text||'Could not generate.';
+    boxEl.classList.add('show');
+    btnEl.textContent='↺ Another example';btnEl.disabled=false;
+  }catch(e){
+    boxEl.textContent='(AI unavailable offline)';boxEl.classList.add('show');
+    btnEl.textContent='✨ Try again';btnEl.disabled=false;
+  }
+}
+function loadAiSentence(){
+  if(!fcOrder.length||!words[fcOrder[fcIdx]])return;
+  const w=words[fcOrder[fcIdx]];
+  callAI(w.w,w.d,document.getElementById('fc-ai-btn'),document.getElementById('fc-ai-sentence'));
+}
+function loadAiSentenceModal(){
+  if(detailWordIdx<0||!words[detailWordIdx])return;
+  const w=words[detailWordIdx];
+  callAI(w.w,w.d,document.getElementById('wd-ai-btn'),document.getElementById('wd-ai-sentence'));
+}
+
+/* ── POMODORO TIMER ── */
+let timerSecs=0,timerRunning=false,timerInterval=null;
+let pomodoroTarget=0,pomodoroMode='stopwatch';
+function setPomodoro(mins){
+  resetTimer();
+  pomodoroTarget=mins*60;pomodoroMode='countdown';
+  document.querySelectorAll('.pomo-preset').forEach(b=>b.classList.remove('on'));
+  const btn=[...document.querySelectorAll('.pomo-preset')].find(b=>+b.dataset.mins===mins);
+  if(btn)btn.classList.add('on');
+  document.getElementById('timer-display').textContent=`${String(mins).padStart(2,'0')}:00`;
+  document.getElementById('pomo-mode').textContent='🍅 Focus';
+  document.getElementById('pomo-mode').classList.add('show');
+}
+function toggleTimer(){
+  timerRunning=!timerRunning;
+  const btn=document.getElementById('timer-start-btn');
+  const disp=document.getElementById('timer-display');
+  if(timerRunning){
+    btn.textContent='⏸ Pause';btn.classList.add('active');disp.classList.add('running');
+    timerInterval=setInterval(()=>{
+      timerSecs++;
+      if(pomodoroMode==='countdown'){
+        const left=Math.max(0,pomodoroTarget-timerSecs);
+        const mm=String(0|left/60).padStart(2,'0');const ss=String(left%60).padStart(2,'0');
+        disp.textContent=`${mm}:${ss}`;
+        if(left===0){clearInterval(timerInterval);timerRunning=false;btn.textContent='▶ Start';btn.classList.remove('active');disp.classList.remove('running');playSound('complete');toast('🍅 Pomodoro done! Take a break.',4000);addXP(25,'Pomodoro completed');launchConfetti();}
+      } else {
+        const mm=String(0|timerSecs/60).padStart(2,'0');const ss=String(timerSecs%60).padStart(2,'0');
+        disp.textContent=`${mm}:${ss}`;
+        if(timerSecs%300===0)addXP(10,'5 min study session');
+      }
+    },1000);
+  } else {
+    btn.textContent='▶ Start';btn.classList.remove('active');disp.classList.remove('running');clearInterval(timerInterval);
+  }
+}
+function resetTimer(){
+  clearInterval(timerInterval);timerRunning=false;timerSecs=0;pomodoroMode='stopwatch';pomodoroTarget=0;
+  document.getElementById('timer-display').textContent='00:00';
+  document.getElementById('timer-display').classList.remove('running');
+  document.getElementById('timer-start-btn').textContent='▶ Start';
+  document.getElementById('timer-start-btn').classList.remove('active');
+  document.getElementById('pomo-mode').classList.remove('show');
+  document.querySelectorAll('.pomo-preset').forEach(b=>b.classList.remove('on'));
+}
+
+/* ── MATCH GAME ── */
+let mgSelected=null,mgMatchedCount=0,mgTotal=0,mgPairs=[];
+let mgStartTime=0,mgTimerInterval=null,mgBestTime={},mgSize=6;
+function initMatch(){
+  const e=document.getElementById('mg-empty'),m=document.getElementById('mg-main');
+  if(words.length<4){e.style.display='';m.style.display='none';return;}
+  e.style.display='none';m.style.display='';
+  document.getElementById('mg-size-btn').textContent=mgSize+' pairs';
+  startMatch();
+}
+function cycleMatchSize(){
+  const sizes=[4,6,8,10];const idx=sizes.indexOf(mgSize);
+  mgSize=sizes[(idx+1)%sizes.length];
+  document.getElementById('mg-size-btn').textContent=mgSize+' pairs';
+  startMatch();
+}
+function startMatch(){
+  clearInterval(mgTimerInterval);
+  document.getElementById('mg-complete').style.display='none';
+  document.getElementById('mg-board').style.display='grid';
+  const n=Math.min(mgSize,words.length);
+  mgPairs=shuf([...words]).slice(0,n);
+  mgSelected=null;mgMatchedCount=0;mgTotal=n;
+  document.getElementById('mg-matched').textContent='0';
+  document.getElementById('mg-total').textContent=n;
+  document.getElementById('mg-time').textContent='0:00';
+  const wordTiles=shuf(mgPairs.map((p,i)=>({id:i,type:'word',text:p.w})));
+  const defTiles=shuf(mgPairs.map((p,i)=>({id:i,type:'def',text:p.d})));
+  const rows=[];for(let i=0;i<n;i++)rows.push(wordTiles[i],defTiles[i]);
+  document.getElementById('mg-board').innerHTML=rows.map(t=>`<div class="mg-tile ${t.type}" data-id="${t.id}" data-type="${t.type}" onclick="mgTileClick(this)">${esc(t.text)}</div>`).join('');
+  mgStartTime=Date.now();
+  mgTimerInterval=setInterval(()=>{
+    const el=Math.floor((Date.now()-mgStartTime)/1000);
+    document.getElementById('mg-time').textContent=`${0|el/60}:${String(el%60).padStart(2,'0')}`;
+  },500);
+}
+function mgTileClick(el){
+  if(el.classList.contains('matched')||el.classList.contains('selected'))return;
+  if(mgSelected===el)return;
+  el.classList.add('selected');
+  if(!mgSelected){mgSelected=el;return;}
+  const a=mgSelected,b=el;mgSelected=null;
+  if(a.dataset.type!==b.dataset.type&&a.dataset.id===b.dataset.id){
+    setTimeout(()=>{
+      a.classList.remove('selected');b.classList.remove('selected');
+      a.classList.add('matched');b.classList.add('matched');
+      mgMatchedCount++;document.getElementById('mg-matched').textContent=mgMatchedCount;
+      recordMastery(mgPairs[+a.dataset.id].w,true);playSound('correct');
+      if(mgMatchedCount===mgTotal){
+        clearInterval(mgTimerInterval);
+        const el2=Math.floor((Date.now()-mgStartTime)/1000);
+        const ts=`${0|el2/60}:${String(el2%60).padStart(2,'0')}`;
+        const key='mg_'+mgTotal;const prev=mgBestTime[key];
+        mgBestTime[key]=prev?Math.min(prev,el2):el2;
+        document.getElementById('mg-board').style.display='none';
+        document.getElementById('mg-complete').style.display='block';
+        document.getElementById('mg-complete-time').textContent='Time: '+ts;
+        document.getElementById('mg-complete-best').textContent=(!prev||el2<=prev)?'🏆 New best time!':'';
+        launchConfetti();playSound('complete');addXP(mgTotal*3+(!prev||el2<=prev?15:0),'match game');checkAchievements();
+      }
+    },200);
+  } else {
+    a.classList.add('wrong');b.classList.add('wrong');
+    recordMastery(mgPairs[+a.dataset.id].w,false);playSound('wrong');
+    setTimeout(()=>{a.classList.remove('selected','wrong');b.classList.remove('selected','wrong');},600);
+  }
+}
+
+/* ── CONFETTI ── */
+function launchConfetti(){}  // removed
+
+/* ── WORD OF THE DAY ── */
+let wotdIdx=-1;
+function initWotd(){
+  if(!SAMPLE.length)return;
+  const base=new Date().toISOString().slice(0,10).split('-').reduce((a,n)=>a+parseInt(n),0);
+  wotdIdx=base%SAMPLE.length;renderWotd();
+}
+function renderWotd(){
+  const w=SAMPLE[wotdIdx%SAMPLE.length];
+  let cat='';for(const[c,list] of Object.entries(SAMPLE_CATEGORIES)){if(list.find(x=>x.w===w.w)){cat=c;break;}}
+  document.getElementById('wotd-word').textContent=w.w;
+  document.getElementById('wotd-def').textContent=w.d;
+  document.getElementById('wotd-cat').textContent=cat;
+}
+function nextWotd(){wotdIdx=(wotdIdx+1)%SAMPLE.length;renderWotd();}
+function addWotdToList(){
+  const word=document.getElementById('wotd-word').textContent;
+  const def=document.getElementById('wotd-def').textContent;
+  if(word==='—')return;
+  if(words.find(x=>x.w===word)){toast('"'+word+'" is already in your list');return;}
+  words.push({w:word,d:def});saveWords();renderList();
+  toast('"'+word+'" added ✓');addXP(2,'word added');playSound('add');
+}
+
+/* ── IMPORT ── */
+function showImportModal(){
+  document.getElementById('import-modal').classList.add('show');
+  document.getElementById('import-text').value='';
+  document.getElementById('import-preview').textContent='';
+  setTimeout(()=>document.getElementById('import-text').focus(),100);
+}
+function hideImportModal(){document.getElementById('import-modal').classList.remove('show');}
+function parseImportText(raw){
+  const lines=raw.split('\n').map(l=>l.trim()).filter(Boolean);const results=[];
+  for(const line of lines){
+    let w='',d='';
+    if(line.includes('\t')){const p=line.split('\t');w=p[0].trim();d=p.slice(1).join('\t').trim();}
+    else if(line.includes(' — ')){const p=line.split(' — ');w=p[0].trim();d=p.slice(1).join(' — ').trim();}
+    else if(line.includes(' - ')){const p=line.split(' - ');w=p[0].trim();d=p.slice(1).join(' - ').trim();}
+    else if(line.includes(', ')){const p=line.split(', ');w=p[0].trim();d=p.slice(1).join(', ').trim();}
+    else if(line.includes(': ')){const p=line.split(': ');w=p[0].trim();d=p.slice(1).join(': ').trim();}
+    if(w&&d)results.push({w,d});
+  }
+  return results;
+}
+function previewImport(){
+  const raw=document.getElementById('import-text').value;const parsed=parseImportText(raw);
+  const prev=document.getElementById('import-preview');
+  if(!raw.trim()){prev.textContent='';prev.className='import-preview';return;}
+  if(!parsed.length){prev.textContent='Could not parse — check format above.';prev.className='import-preview warn';return;}
+  const dupes=parsed.filter(p=>words.find(x=>x.w.toLowerCase()===p.w.toLowerCase())).length;
+  const net=parsed.length-dupes;
+  prev.textContent=`Found ${parsed.length} word${parsed.length!==1?'s':''}${dupes?' ('+dupes+' exist, '+net+' new)':''}`;
+  prev.className='import-preview '+(net>0?'ok':'warn');
+}
+function doImport(){
+  const raw=document.getElementById('import-text').value;
+  const parsed=parseImportText(raw);
+  if(!parsed.length){toast('Nothing to import — check the format');return;}
+  let added=0;
+  parsed.forEach(p=>{
+    if(!words.find(x=>x.w.toLowerCase()===p.w.toLowerCase())){words.push({w:p.w,d:p.d});added++;}
+  });
+  saveWords();renderList();hideImportModal();
+  toast('Imported '+added+' word'+(added!==1?'s':'')+' ✓');
+  if(added>0)addXP(added*2,'words imported');
+}
+
+/* ── TAG SYSTEM ── */
+let tags={};          // {tagName: {color, words:Set}}
+let activeTagFilter=null;
+const TAG_COLORS=['#3B6E52','#2B5D9E','#9B6E1A','#C44B2B','#7B3FAA','#1A6B6B'];
+let tagColorIdx=0;
+
+function addTag(name){
+  name=name.trim();
+  if(!name||tags[name])return;
+  tags[name]={color:TAG_COLORS[tagColorIdx%TAG_COLORS.length],words:[]};
+  tagColorIdx++;
+  saveWords();renderTagBars();renderList();
+}
+function removeTag(name){
+  delete tags[name];
+  if(activeTagFilter===name)activeTagFilter=null;
+  saveWords();renderTagBars();renderList();
+}
+function toggleWordTag(wordStr,tagName){
+  if(!tags[tagName])return;
+  const arr=tags[tagName].words;
+  const idx=arr.indexOf(wordStr);
+  if(idx>=0)arr.splice(idx,1); else arr.push(wordStr);
+  saveWords();renderList();
+}
+function setTagFilter(name){
+  activeTagFilter=activeTagFilter===name?null:name;
+  renderTagBars();renderList();
+}
+function renderTagBars(){
+  const bar=document.getElementById('tags-filter-bar');
+  if(!bar)return;
+  const names=Object.keys(tags);
+  if(!names.length){bar.innerHTML='';return;}
+  bar.innerHTML=names.map(n=>{
+    const t=tags[n];
+    const isActive=activeTagFilter===n;
+    const lightHex=t.color+'22';
+    return `<span class="tag-pill" style="background:${isActive?t.color:lightHex};color:${isActive?'#fff':t.color};border-color:${t.color}" onclick="setTagFilter('${esc(n)}')">#${esc(n)} <span style="opacity:.6;font-size:.65rem" onclick="event.stopPropagation();removeTag('${esc(n)}')">×</span></span>`;
+  }).join('');
+}
+
+/* ── UPDATED renderList with tag support ── */
+function renderList(){
+  const q=(document.getElementById('sinp').value||'').toLowerCase();
+  let list=words.map((w,i)=>({...w,i}));
+  if(q)list=list.filter(w=>w.w.toLowerCase().includes(q)||w.d.toLowerCase().includes(q));
+  if(activeTagFilter&&tags[activeTagFilter])list=list.filter(w=>tags[activeTagFilter].words.includes(w.w));
+  if(sortAZ)list=[...list].sort((a,b)=>a.w.localeCompare(b.w));
+  const el=document.getElementById('word-list');
+  if(!list.length){
+    el.innerHTML=`<div class="empty"><span class="empty-icon">📭</span><strong>${q||activeTagFilter?'No matches':'No words yet'}</strong>${q?'Try a different search.':activeTagFilter?'No words with tag #'+activeTagFilter+'.':'Add a word above to get started.'}</div>`;
+    updateBadge();return;
+  }
+  el.innerHTML=list.map(({w,d,i})=>{
+    const m=mastery[w]||{c:0,a:0};
+    const pct=m.a>0?Math.round(m.c/m.a*100):0;
+    const fillCol=pct>=80?'var(--green)':pct>=50?'var(--amber)':'var(--accent)';
+    const masteryHTML=m.a>0?`<div class="mastery-bar-wrap"><div class="mastery-bar"><div class="mastery-fill" style="width:${pct}%;background:${fillCol}"></div></div><span class="mastery-pct">${pct}%</span></div>`:'';
+    const wordTags=Object.entries(tags).filter(([,t])=>t.words.includes(w)).map(([n,t])=>
+      `<span class="wi-tag" style="background:${t.color}22;color:${t.color}">#${esc(n)}</span>`).join('');
+    return `<div class="wi">
+      <span class="wi-n">${i+1}</span>
+      <span class="wi-dot ${diff[w]||''}"></span>
+      <span class="wi-word" onclick="showWordDetail(${i})" style="cursor:pointer">${esc(w)}</span>
+      <span class="wi-def">${esc(d)}</span>
+      ${wordTags?`<div class="wi-tags">${wordTags}</div>`:''}
+      ${masteryHTML}
+      <button class="wi-del" onclick="delWord(${i})">×</button>
+    </div>`;
+  }).join('');
+  updateBadge();
+}
+
+/* ── ADAPTIVE PRACTICE MODE ── */
+let practiceQ=[], practiceIdx=0, practiceCorrect=0, practiceTotal=20;
+let practiceTimer=null, practiceTimeLeft=10;
+const PRACTICE_TIME=10;
+
+function buildAdaptivePool(){
+  if(!words.length)return[];
+  // Weight: hard/low-mastery words appear more
+  const pool=[];
+  words.forEach(w=>{
+    const m=mastery[w.w]||{c:0,a:0};
+    const pct=m.a>0?m.c/m.a:0.5;
+    const d=diff[w.w];
+    let weight=1;
+    if(pct<0.4)weight=4;
+    else if(pct<0.6)weight=3;
+    else if(pct<0.8)weight=2;
+    if(d==='hard')weight+=2;
+    for(let i=0;i<weight;i++)pool.push(w);
+  });
+  return shuf(pool);
+}
+
+function startPractice(){
+  practiceQ=buildAdaptivePool().slice(0,practiceTotal);
+  practiceIdx=0;practiceCorrect=0;
+  updatePracticeGauge();
+  renderPracticeQ();
+}
+
+function updatePracticeGauge(){
+  const pct=practiceIdx>0?Math.round(practiceCorrect/practiceIdx*100):0;
+  const fill=document.getElementById('pg-fill');
+  const label=document.getElementById('pg-label');
+  const qLabel=document.getElementById('pg-q');
+  if(!fill)return;
+  fill.style.width=pct+'%';
+  fill.style.background=pct>=80?'var(--green)':pct>=50?'var(--amber)':'var(--accent)';
+  label.textContent=practiceIdx>0?pct+'%':'—';
+  qLabel.textContent=practiceIdx+'/'+practiceTotal;
+}
+
+function startPracticeTimer(){
+  clearInterval(practiceTimer);
+  practiceTimeLeft=PRACTICE_TIME;
+  updateTimePressure();
+  practiceTimer=setInterval(()=>{
+    practiceTimeLeft--;
+    updateTimePressure();
+    if(practiceTimeLeft<=0){
+      clearInterval(practiceTimer);
+      // Time's up — count as wrong
+      const q=practiceQ[practiceIdx];
+      if(q)recordMastery(q.w,false);
+      playSound('wrong');
+      const fb=document.getElementById('qfb');
+      fb.className='fb show no';
+      fb.textContent='Time\'s up! Answer: '+(practiceQ[practiceIdx]?.w||'');
+      document.getElementById('qnext').style.display='';
+      qAns=true;
+    }
+  },1000);
+}
+
+function updateTimePressure(){
+  const fill=document.getElementById('tp-fill');
+  const secs=document.getElementById('tp-secs');
+  if(!fill)return;
+  const pct=(practiceTimeLeft/PRACTICE_TIME)*100;
+  fill.style.width=pct+'%';
+  fill.className='tp-fill'+(practiceTimeLeft<=3?' danger':practiceTimeLeft<=5?' warn':'');
+  secs.textContent=practiceTimeLeft;
+}
+
+/* ── DUEL MODE ── */
+let duelScores=[0,0], duelCurrentPlayer=0, duelRound=0;
+const DUEL_ROUNDS=10;
+
+function startDuel(){
+  duelScores=[0,0];duelCurrentPlayer=0;duelRound=0;
+  document.getElementById('duel-setup-view').style.display='none';
+  document.getElementById('duel-q-view').style.display='';
+  document.getElementById('duel-results-view').style.display='none';
+  runDuelQuestion();
+}
+
+function runDuelQuestion(){
+  if(duelRound>=DUEL_ROUNDS*2){showDuelResults();return;}
+  const player=duelCurrentPlayer;
+  const turn=Math.floor(duelRound/2)+1;
+  const badge=document.getElementById('duel-turn-badge');
+  badge.textContent=`Player ${player+1}'s turn — Question ${turn}/${DUEL_ROUNDS}`;
+  badge.style.background=player===0?'var(--accent-l)':'var(--blue-l)';
+  badge.style.color=player===0?'var(--accent-d)':'var(--blue-d)';
+  document.getElementById(`dp${player+1}`).classList.add('active-player');
+  document.getElementById(`dp${player===0?2:1}`).classList.remove('active-player');
+  // use existing quiz engine — hijack qList
+  const pool=shuf([...words]);
+  qList=pool.slice(0,Math.min(10,pool.length));
+  qIdx=0;qScore=0;qAns=false;
+  document.getElementById('qz-res').style.display='none';
+  document.getElementById('qz-q').style.display='';
+  
+  renderDuelQ();
+}
+
+function renderDuelQ(){
+  if(duelRound%2===0&&qIdx>=1){
+    // Each player answers 1 per round exchange
+    duelScores[duelCurrentPlayer]+=qScore;
+    duelRound++;duelCurrentPlayer=duelCurrentPlayer===0?1:0;
+    if(duelRound>=DUEL_ROUNDS*2){showDuelResults();return;}
+    runDuelQuestion();return;
+  }
+  // Actually just use 1 question per turn
+  qAns=false;
+  const q=qList[0];
+  document.getElementById('qprog').textContent=`Player ${duelCurrentPlayer+1} — Turn ${Math.floor(duelRound/2)+1}/${DUEL_ROUNDS}`;
+  document.getElementById('qscore').textContent=`P1: ${duelScores[0]} · P2: ${duelScores[1]}`;
+  document.getElementById('q-bar').style.width=`${(duelRound/(DUEL_ROUNDS*2))*100}%`;
+  document.getElementById('qfb').className='fb';
+  document.getElementById('qnext').style.display='none';
+  document.getElementById('mc-area').style.display='none';
+  document.getElementById('fill-area').style.display='none';
+  document.getElementById('spell-area').style.display='none';
+  const useW=Math.random()<.5;
+  const qt=document.getElementById('qtext');
+  qt.innerHTML=useW?`What does <span class="qkw">"${esc(q.w)}"</span> mean?`:`Which word matches: <span class="qkw">"${esc(q.d)}"</span>?`;
+  document.getElementById('mc-area').style.display='grid';
+  const others=shuf(words.filter(x=>x.w!==q.w)).slice(0,3);
+  const opts=shuf([...others,q]);
+  const L=['A','B','C','D'];
+  document.getElementById('mc-area').innerHTML=opts.map((o,li)=>{
+    const val=esc(useW?o.d:o.w);const ir=o.w===q.w;
+    return `<button class="choice" onclick="duelPick(this,${ir},'${esc(q.w)}')">${L[li]} ${val}</button>`;
+  }).join('');
+}
+
+function duelPick(el,right,wordStr){
+  if(qAns)return;qAns=true;
+  document.querySelectorAll('.choice').forEach(c=>c.disabled=true);
+  if(right){el.classList.add('correct');duelScores[duelCurrentPlayer]++;playSound('correct');}
+  else{el.classList.add('wrong');playSound('wrong');document.querySelectorAll('.choice').forEach(c=>{if(c!==el&&c.textContent.slice(2)===qList[0].w)c.classList.add('correct');});}
+  recordMastery(wordStr,right);
+  document.getElementById('qfb').className='fb show '+(right?'ok':'no');
+  document.getElementById('qfb').textContent=right?'Correct!':'Not quite.';
+  document.getElementById('d1s').textContent=duelScores[0];
+  document.getElementById('d2s').textContent=duelScores[1];
+  setTimeout(()=>{
+    duelRound++;duelCurrentPlayer=duelCurrentPlayer===0?1:0;
+    if(duelRound>=DUEL_ROUNDS*2){showDuelResults();}
+    else runDuelQuestion();
+  },1200);
+}
+
+function showDuelResults(){
+  document.getElementById('duel-q-view').style.display='none';
+  document.getElementById('duel-results-view').style.display='';
+  document.getElementById('qz-q').style.display='none';
+  const [s1,s2]=duelScores;
+  let winnerText='';
+  if(s1>s2)winnerText='🏆 Player 1 wins!';
+  else if(s2>s1)winnerText='🏆 Player 2 wins!';
+  else winnerText='🤝 It\'s a tie!';
+  document.getElementById('duel-winner-text').textContent=winnerText;
+  document.getElementById('duel-final-scores').innerHTML=
+    `<div class="duel-final-card"><div class="dfc-name">Player 1</div><div class="dfc-score ${s1>=s2?'winner':''}">${s1}</div></div>`+
+    `<div class="duel-final-card"><div class="dfc-name">Player 2</div><div class="dfc-score ${s2>=s1&&s2>0?'winner':''}">${s2}</div></div>`;
+  if(s1!==s2)launchConfetti();
+  addXP(Math.max(s1,s2)*4,'duel completed');checkAchievements();
+}
+
+function resetDuel(){
+  duelScores=[0,0];duelCurrentPlayer=0;duelRound=0;
+  document.getElementById('d1s').textContent='—';document.getElementById('d2s').textContent='—';
+  document.getElementById('dp1').classList.remove('active-player');document.getElementById('dp2').classList.remove('active-player');
+  document.getElementById('duel-setup-view').style.display='';
+  document.getElementById('duel-q-view').style.display='none';
+  document.getElementById('duel-results-view').style.display='none';
+}
+
+/* ── WEAK WORDS & REVIEW QUEUE (in Progress panel) ── */
+function renderWeakWords(){
+  const el=document.getElementById('weak-words-section');
+  if(!el)return;
+  const tracked=Object.entries(mastery).filter(([,m])=>m.a>=2).map(([w,m])=>({w,pct:Math.round(m.c/m.a*100),a:m.a}));
+  if(!tracked.length){el.innerHTML='<div style="font-size:.8rem;color:var(--ink3);font-style:italic">Complete some quizzes to see your weak words here.</div>';return;}
+  const sorted=tracked.sort((a,b)=>a.pct-b.pct).slice(0,10);
+  el.innerHTML=sorted.map(({w,pct,a})=>{
+    const col=pct>=80?'var(--green)':pct>=50?'var(--amber)':'var(--accent)';
+    return `<div class="weak-word-row">
+      <span class="wwr-word">${esc(w)}</span>
+      <div class="wwr-bar"><div class="wwr-fill" style="width:${pct}%;background:${col}"></div></div>
+      <span class="wwr-pct" style="color:${col}">${pct}%</span>
+      <span class="wwr-attempts">${a} tries</span>
+    </div>`;
+  }).join('');
+}
+
+function renderReviewQueue(){
+  const el=document.getElementById('review-queue-words');
+  if(!el)return;
+  // Words that are hard-rated or have low mastery
+  const due=words.filter(w=>{
+    const m=mastery[w.w]||{c:0,a:0};
+    const pct=m.a>0?m.c/m.a:1;
+    return diff[w.w]==='hard'||pct<0.5;
+  }).slice(0,15);
+  if(!due.length){el.innerHTML='<div style="font-size:.78rem;color:var(--ink3);font-style:italic">No reviews due yet.</div>';return;}
+  const colors=['#C44B2B','#9B6E1A','#3B6E52','#2B5D9E'];
+  el.innerHTML=due.map((w,i)=>`<span class="rqc-word" style="background:${colors[i%colors.length]}22;color:${colors[i%colors.length]}" onclick="showWordDetail(${words.indexOf(w)})">${esc(w.w)}</span>`).join('');
+}
+
+/* ── PATCH refreshProgressUI to include new sections ── */
+/* ── PATCH setType to handle practice & duel ── */
+/* ── PATCH saveWords to include tags ── */
+function saveWords(){
+  try{
+    // Convert tag word sets to arrays for JSON
+    const tagsToSave={};
+    for(const[k,v] of Object.entries(tags))tagsToSave[k]={color:v.color,words:[...v.words]};
+    localStorage.setItem(WORDS_KEY,JSON.stringify({words,diff,mastery,tags:tagsToSave}));
+  }catch(e){}
+}
+// Re-load tags from storage on init
+(function reloadTags(){
+  try{
+    const s=localStorage.getItem(WORDS_KEY);
+    if(s){const d=JSON.parse(s);if(d.tags){tags={};for(const[k,v] of Object.entries(d.tags))tags[k]={color:v.color,words:v.words||[]};}}
+  }catch(e){}
+  renderTagBars();
+})();
+
+/* ── TAG MANAGEMENT UI (show in word detail modal) ── */
+document.addEventListener('keydown',e=>{
+  const ai=[...document.querySelectorAll('.tab')].findIndex(t=>t.classList.contains('active'));
+  const inInput=['INPUT','TEXTAREA'].includes(document.activeElement.tagName);
+  if(ai===1&&!inInput){
+    if(e.key===' '){e.preventDefault();flipCard();}
+    if(e.key==='ArrowRight')fcMove(1);if(e.key==='ArrowLeft')fcMove(-1);
+    if(e.key==='1')rateDiff('hard');if(e.key==='2')rateDiff('medium');if(e.key==='3')rateDiff('easy');
+  }
+  if(ai===2&&!inInput&&e.key==='Enter'){const n=document.getElementById('qnext');if(n&&n.style.display!=='none')nextQ();}
+  if(e.key==='Escape'){hideImportModal();closeWordDetail();closeLevelUp();}
+});
+
+/* ── SW: 6 TABS ── */
+function sw(t){
+  ['manage','flash','quiz','match','progress','settings'].forEach((id,i)=>{
+    document.getElementById('panel-'+id).classList.toggle('active',id===t);
+    document.querySelectorAll('.tab')[i].classList.toggle('active',id===t);
+  });
+  if(t==='flash')initFlash();
+  if(t==='quiz')initQuiz();
+  if(t==='match')initMatch();
+  if(t==='progress'){refreshProgressUI();}
+  if(t==='settings')initSettings();
+}
+
+/* ── QUIZ LENGTH ── */
+let quizLen=10;
+function setQuizLen(n){
+  quizLen=n;
+  document.querySelectorAll('.ql-btn').forEach(b=>b.classList.remove('active'));
+  const labels={5:'5',10:'10',20:'20',0:'All'};
+  document.querySelectorAll('.ql-btn').forEach(b=>{if(b.textContent===labels[n])b.classList.add('active');});
+}
+
+/* ── PRACTICE TIME ── */
+function setPracticeTime(s){
+  // PRACTICE_TIME is const — use a mutable var instead
+  practiceTimeOverride=s;
+  document.querySelectorAll('[id^="pt-active"]').forEach(b=>b.classList.remove('active'));
+  const btn=document.getElementById('pt-active-'+s);
+  if(btn)btn.classList.add('active');
+}
+let practiceTimeOverride=10;
+function getPracticeTime(){return practiceTimeOverride;}
+
+/* ── SETTINGS PANEL ── */
+function initSettings(){
+  const dark=document.documentElement.dataset.theme==='dark';
+  const dBtn=document.getElementById('dark-toggle');
+  if(dBtn){dBtn.textContent=dark?'On':'Off';dBtn.classList.toggle('on',dark);}
+  const sBtn=document.getElementById('sound-toggle');
+  if(sBtn){sBtn.textContent=soundOn?'On':'Off';sBtn.classList.toggle('on',soundOn);}
+  const sfStatus=document.getElementById('sf-status');
+  if(sfStatus&&false){
+    sfStatus.textContent=P.streakFreeze?'🛡️ Active — will protect your next missed day':'Not active';
+    sfStatus.className='sf-status'+(P.streakFreeze?' active':'');
+  }
+  const sfBtn=document.getElementById('sf-btn');
+  if(sfBtn){sfBtn.disabled=true;sfBtn.textContent='Removed';}
+}
+function toggleSoundSetting(){
+  soundOn=!soundOn;
+  document.getElementById('sound-btn').textContent=soundOn?'🔔':'🔕';
+  const sBtn=document.getElementById('sound-toggle');
+  if(sBtn){sBtn.textContent=soundOn?'On':'Off';sBtn.classList.toggle('on',soundOn);}
+  toast(soundOn?'Sounds on':'Sounds off');
+}
+
+function buyStreakFreeze(){toast("Feature removed.");}
+
+/* ── CSV EXPORT ── */
+function exportCSV(){
+  if(!words.length){toast('No words to export');return;}
+  const rows=[['Word','Definition','Difficulty','Correct','Attempts','Accuracy']];
+  words.forEach(w=>{
+    const m=mastery[w.w]||{c:0,a:0};
+    const pct=m.a>0?Math.round(m.c/m.a*100)+'%':'—';
+    rows.push([w.w,w.d,diff[w.w]||'—',m.c,m.a,pct]);
+  });
+  const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='vocab-export.csv';a.click();
+  toast('Exported CSV ✓');
+}
+
+/* ── SCORE HISTORY TABLE ── */
+function renderScoreHistoryTable(){
+  const el=document.getElementById('score-history-table');
+  if(!el)return;
+  const hist=P.quizHistory.slice().reverse().slice(0,20);
+  if(!hist.length){el.innerHTML='<div class="history-empty">No quiz history yet — complete a quiz to see results here.</div>';return;}
+  el.innerHTML=`<table class="history-table">
+    <thead><tr><th>#</th><th>Date</th><th>Score</th><th>Correct</th></tr></thead>
+    <tbody>${hist.map((h,i)=>{
+      const pct=Math.round(h.score/h.total*100);
+      const cls=pct>=80?'hi':pct>=50?'mid':'lo';
+      const d=new Date(h.date).toLocaleDateString('en',{month:'short',day:'numeric'});
+      return `<tr><td>${P.quizHistory.length-i}</td><td>${d}</td><td class="score-cell ${cls}">${pct}%</td><td>${h.score}/${h.total}</td></tr>`;
+    }).join('')}</tbody>
+  </table>`;
+}
+
+/* ── PATCH refreshProgressUI to render score table ── */
+/* ── PATCH startQuiz to use quizLen ── */
+function startQuiz(){
+  document.getElementById('qz-res').style.display='none';
+  document.getElementById('qz-q').style.display='';
+  let pool=words;
+  if(qType==='hard'){
+    const h=words.filter(w=>diff[w.w]==='hard');
+    if(h.length>=4)pool=h;else toast('Not enough hard words, using all');
+  }
+  if(pool.length<2){toast('Add more words first!');return;}
+  const limit=quizLen===0?pool.length:quizLen;
+  qList=shuf([...pool]).slice(0,Math.min(limit,pool.length));
+  qIdx=0;qScore=0;qAns=false;qStreak=0;qBest=0;qWrong=[];
+  
+  renderQ();
+}
+
+/* ── PRONUNCIATION HINTS (Web Speech API) ── */
+function speakWord(word){
+  if(!('speechSynthesis' in window)){toast('Speech not supported in this browser');return;}
+  window.speechSynthesis.cancel();
+  const utt=new SpeechSynthesisUtterance(word);
+  utt.rate=0.85;utt.pitch=1;utt.lang='en-US';
+  window.speechSynthesis.speak(utt);
+}
+
+/* ── PATCH flashcard renderCard to add speak button ── */
+function renderCard(){
+  if(!fcOrder.length||!words[fcOrder[fcIdx]])return;
+  const w=words[fcOrder[fcIdx]];
+  document.getElementById('fc-word').textContent=w.w;
+  document.getElementById('fc-def').textContent=w.d;
+  document.getElementById('fc-ctr').textContent=`${fcIdx+1} / ${fcOrder.length}`;
+  document.getElementById('fc-prog').style.width=`${((fcIdx+1)/fcOrder.length)*100}%`;
+  document.getElementById('fc-inner').classList.remove('flipped');
+  fcFlipped=false;
+  document.getElementById('fc-tap').textContent='tap card to reveal · space to flip';
+  document.getElementById('fc-diff').style.display='none';
+  document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('on'));
+  const cd=diff[w.w];
+  if(cd){const sel=document.querySelector('.diff-btn.'+cd[0]+'b');if(sel)sel.classList.add('on');}
+  // Add speak button to front face
+  const wordEl=document.getElementById('fc-word');
+  if(wordEl){
+    const existing=wordEl.parentNode.querySelector('.pronun-row');
+    if(existing)existing.remove();
+    const row=document.createElement('div');
+    row.className='pronun-row';
+    const safeWord=w.w.replace(/'/g,"\'");
+    row.innerHTML=`<button class="pronun-btn" onclick="event.stopPropagation();speakWord('${safeWord}')">🔊 Hear it</button>`;
+    wordEl.parentNode.insertBefore(row,wordEl.nextSibling);
+  }
+  // Reset AI sentence on back
+  const aib=document.getElementById('fc-ai-btn');
+  const ais=document.getElementById('fc-ai-sentence');
+  if(aib){aib.textContent='✨ Example sentence';aib.disabled=false;}
+  if(ais){ais.textContent='';ais.classList.remove('show');}
+}
+
+/* ── PATCH markActivity to use streak freeze ── */
+function markActivity(count=1){
+  const today=new Date().toISOString().slice(0,10);
+  P.activity[today]=(P.activity[today]||0)+count;
+  const yest=new Date(Date.now()-864e5).toISOString().slice(0,10);
+  const twoDaysAgo=new Date(Date.now()-2*864e5).toISOString().slice(0,10);
+  if(P.lastActiveDate===today){
+    // already today
+  } else if(P.lastActiveDate===yest){
+    P.dayStreak++;
+  } else if(P.streakFreeze&&P.lastActiveDate===twoDaysAgo){
+    // Use the freeze to bridge yesterday
+    P.streakFreeze=false;
+    P.dayStreak++;
+    toast('🛡️ Streak freeze used to protect your streak!',3500);
+  } else {
+    P.dayStreak=1;
+  }
+  P.lastActiveDate=today;
+  saveProgress();
+}
+
+/* ── TYPING RACE ── */
+let raceWords=[], raceIdx=0, raceCorrect=0, raceMistakes=0;
+let raceStart=0, raceTimerInterval=null, raceDuration=30;
+
+function startRace(){
+  if(words.length<3){toast('Add more words first!');return;}
+  document.getElementById('race-playing').style.display='';
+  document.getElementById('race-result').style.display='none';
+  raceWords=shuf([...words]);
+  raceIdx=0;raceCorrect=0;raceMistakes=0;raceStart=Date.now();
+  updateRaceDisplay();
+  const inp=document.getElementById('race-input');
+  inp.value='';inp.className='race-input';inp.disabled=false;
+  clearInterval(raceTimerInterval);
+  let elapsed=0;
+  raceTimerInterval=setInterval(()=>{
+    elapsed++;
+    const left=raceDuration-elapsed;
+    const mm=String(0|left/60).padStart(2,'0');
+    const ss=String(left%60).padStart(2,'0');
+    document.getElementById('race-timer').textContent=mm+':'+ss;
+    document.getElementById('race-bar').style.width=(elapsed/raceDuration*100)+'%';
+    const wpm=elapsed>0?Math.round((raceCorrect*60)/elapsed):0;
+    document.getElementById('race-wpm').textContent=wpm;
+    if(left<=0){clearInterval(raceTimerInterval);endRace();}
+  },1000);
+  setTimeout(()=>inp.focus(),60);
+}
+
+function updateRaceDisplay(){
+  if(raceIdx>=raceWords.length){endRace();return;}
+  const w=raceWords[raceIdx];
+  document.getElementById('race-prompt').textContent=w.w;
+  document.getElementById('race-hint').textContent=w.d;
+  document.getElementById('race-chars').textContent=`${raceIdx} / ${raceWords.length}`;
+}
+
+function raceInput(){
+  const inp=document.getElementById('race-input');
+  const target=raceWords[raceIdx]?.w||'';
+  const val=inp.value;
+  // Auto-submit if they've typed enough and it matches
+  if(val.toLowerCase()===target.toLowerCase()){
+    raceSubmit();
+  }
+}
+
+function raceSubmit(){
+  const inp=document.getElementById('race-input');
+  const ans=inp.value.trim();
+  if(!ans)return;
+  const target=raceWords[raceIdx]?.w||'';
+  const ok=ans.toLowerCase()===target.toLowerCase();
+  inp.className='race-input '+(ok?'hit':'miss');
+  if(ok){
+    raceCorrect++;recordMastery(target,true);playSound('correct');
+    setTimeout(()=>{
+      inp.value='';inp.className='race-input';
+      raceIdx++;updateRaceDisplay();
+    },180);
+  } else {
+    raceMistakes++;recordMastery(target,false);playSound('wrong');
+    setTimeout(()=>{inp.value='';inp.className='race-input';},350);
+  }
+}
+
+function endRace(){
+  clearInterval(raceTimerInterval);
+  const inp=document.getElementById('race-input');
+  if(inp)inp.disabled=true;
+  document.getElementById('race-playing').style.display='none';
+  document.getElementById('race-result').style.display='';
+  const elapsed=(Date.now()-raceStart)/1000;
+  const wpm=elapsed>0?Math.round((raceCorrect*60)/elapsed):0;
+  document.getElementById('rr-wpm').textContent=wpm;
+  const msgs=wpm>=60?'Blazing fast! 🔥':wpm>=40?'Excellent speed!':wpm>=25?'Solid pace!':'Keep practicing!';
+  document.getElementById('rr-msg').textContent=msgs;
+  document.getElementById('rr-pills').innerHTML=
+    `<span class="pill ok">${raceCorrect} correct</span><span class="pill no">${raceMistakes} mistakes</span>`;
+  const xpGain=raceCorrect*3+(wpm>=40?20:0);
+  addXP(xpGain,'typing race');
+  showXPPop('+'+xpGain+' XP');
+  if(wpm>=40)launchConfetti();
+  saveWords();checkAchievements();
+}
+
+/* ── DAILY CHALLENGE ── */
+function initDailyChallenge(){
+  const today=new Date().toISOString().slice(0,10);
+  const done=P.lastDailyChallenge===today;
+  const badge=document.getElementById('dc-badge');
+  const sub=document.getElementById('dc-sub');
+  const streakTxt=document.getElementById('dc-streak-text');
+  if(badge){badge.textContent=done?'Done ✓':'Start →';badge.className='db-badge'+(done?' done':'');}
+  if(sub)sub.textContent=done?'Come back tomorrow for a new challenge!':'10 questions · earn +50 bonus XP';
+  if(streakTxt)streakTxt.textContent=P.challengeStreak>0?'🔥 '+P.challengeStreak+' day challenge streak':'';
+}
+
+function startDailyChallenge(){
+  const today=new Date().toISOString().slice(0,10);
+  if(P.lastDailyChallenge===today){toast('Daily challenge already completed! Come back tomorrow.');return;}
+  if(words.length<4){toast('Add at least 4 words to take the challenge!');return;}
+  // Use all words, pick 10 random
+  P._isDailyChallenge=true;
+  sw('quiz');
+  qType='mc';
+  ['tb-mc','tb-fill','tb-spell','tb-hard','tb-practice','tb-duel','tb-race'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.classList.remove('active');
+  });
+  document.getElementById('tb-mc').classList.add('active');
+  qList=shuf([...words]).slice(0,Math.min(10,words.length));
+  qIdx=0;qScore=0;qAns=false;qStreak=0;qBest=0;qWrong=[];
+  
+  document.getElementById('qz-res').style.display='none';
+  document.getElementById('qz-q').style.display='';
+  ['practice-wrap','duel-wrap','race-wrap'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  renderQ();
+}
+
+function completeDailyChallenge(score,total){
+  const today=new Date().toISOString().slice(0,10);
+  if(P.lastDailyChallenge===today)return;
+  P.lastDailyChallenge=today;
+  const yest=new Date(Date.now()-864e5).toISOString().slice(0,10);
+  P.challengeStreak=(P.lastDailyChallenge===yest)?((P.challengeStreak||0)+1):1;
+  saveProgress();
+  addXP(50,'daily challenge bonus');
+  showXPPop('+50 XP Daily Bonus!');
+  toast('🗓️ Daily challenge complete! +50 bonus XP',3500);
+  initDailyChallenge();
+}
+
+/* ── XP POP ANIMATION ── */
+function showXPPop(){}  // removed
+
+/* ── MATCH GAME KEYBOARD NAV ── */
+function mgKeyNav(key){
+  const tiles=[...document.querySelectorAll('.mg-tile:not(.matched)')];
+  const n=parseInt(key)-1;
+  if(n>=0&&n<tiles.length){mgTileClick(tiles[n]);}
+}
+
+/* ── AI ETYMOLOGY in Word Detail ── */
+async function loadEtymology(){
+  const w=words[detailWordIdx];if(!w)return;
+  const etymBtn=document.getElementById('etym-btn');
+  const etymBox=document.getElementById('etym-box');
+  if(!etymBtn||!etymBox)return;
+  etymBtn.textContent='⏳ Loading…';etymBtn.disabled=true;
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:80,
+        messages:[{role:'user',content:`Give a ONE-sentence etymology for the word "${w.w}". Be concise. Start with the origin language.`}]})
+    });
+    const data=await resp.json();
+    const text=data.content?.[0]?.text||'Etymology unavailable.';
+    etymBox.querySelector('.etym-text').textContent=text;
+    etymBox.style.display='block';
+    etymBtn.textContent='↺ Refresh';etymBtn.disabled=false;
+  }catch(e){
+    etymBox.querySelector('.etym-text').textContent='(Offline — etymology unavailable)';
+    etymBox.style.display='block';
+    etymBtn.textContent='🌿 Etymology';etymBtn.disabled=false;
+  }
+}
+
+/* ── PATCH showWordDetail to include etymology + speak button ── */
+/* ── PATCH setType to handle race mode ── */
+function setType(t){
+  ['practice-wrap','duel-wrap','race-wrap'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  document.getElementById('qz-q').style.display='';
+  document.getElementById('qz-res').style.display='none';
+  ['tb-mc','tb-fill','tb-spell','tb-hard','tb-practice','tb-duel','tb-race'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('active');});
+  const btnMap={mc:'tb-mc',fill:'tb-fill',spell:'tb-spell',hard:'tb-hard',practice:'tb-practice',duel:'tb-duel',race:'tb-race'};
+  const btn=document.getElementById(btnMap[t]);if(btn)btn.classList.add('active');
+  qType=t;
+  if(t==='practice'){
+    document.getElementById('practice-wrap').style.display='';
+    startPractice();
+  } else if(t==='duel'){
+    document.getElementById('duel-wrap').style.display='';
+    document.getElementById('qz-q').style.display='none';
+    resetDuel();
+  } else if(t==='race'){
+    document.getElementById('race-wrap').style.display='';
+    document.getElementById('qz-q').style.display='none';
+    startRace();
+  } else {
+    startQuiz();
+  }
+}
+
+/* ── PATCH addXP to show pop animation ── */
+function addXP(amount,reason){}  // gamification removed
+
+/* ── PATCH showResults to handle daily challenge ── */
+function showResults(){
+  document.getElementById('qz-res').style.display='';
+  document.getElementById('qz-q').style.display='none';
+  const pct=Math.round((qScore/qList.length)*100);
+  document.getElementById('res-pct').textContent=pct+'%';
+  const msgs=[[0,'Keep practicing — you will get there.'],[40,'Good effort! Review the tricky ones.'],[60,'Solid work! Getting there.'],[80,'Great job! Nearly perfect.'],[100,'Perfect score! Outstanding.']];
+  const mi=msgs.slice().reverse().find(([k])=>pct>=k);
+  document.getElementById('res-msg').textContent=mi[1];
+  const pills=document.getElementById('res-pills');
+  pills.innerHTML=`<span class="pill ok">${qScore} correct</span><span class="pill no">${qList.length-qScore} incorrect</span>`;
+  if(qBest>=3)pills.innerHTML+=`<span class="pill str">🔥 ${qBest} streak</span>`;
+  const C=document.getElementById('ring-c');
+  const circ=2*Math.PI*54;
+  C.style.strokeDasharray=circ;C.style.strokeDashoffset=circ;
+  C.style.stroke=pct>=80?'var(--green)':pct>=50?'var(--amber)':'var(--accent)';
+  setTimeout(()=>{C.style.strokeDashoffset=circ*(1-pct/100);},80);
+  recordQuizResult(qScore,qList.length,qBest);
+  if(pct===100)launchConfetti();
+  playSound(pct>=70?'complete':'wrong');
+  if(P.dayStreak>0){document.getElementById('streak-hdr').style.display='flex';document.getElementById('streak-n').textContent=P.dayStreak;}
+  // Daily challenge completion
+  if(P._isDailyChallenge){
+    P._isDailyChallenge=false;
+    completeDailyChallenge(qScore,qList.length);
+  }
+}
+
+/* ── PATCH keyboard to add match keyboard nav ── */
+document.addEventListener('keydown',e=>{
+  const ai=[...document.querySelectorAll('.tab')].findIndex(t=>t.classList.contains('active'));
+  if(ai===3&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)){
+    if(e.key>='1'&&e.key<='8')mgKeyNav(e.key);
+  }
+});
+
+/* ── NOTEBOOK ── */
+let notes={};  // {word: noteText}
+const NOTES_KEY='vocabbuilder_notes_v1';
+function loadNotes(){try{const s=localStorage.getItem(NOTES_KEY);if(s)notes=JSON.parse(s);}catch(e){notes={};}}
+function saveNotes(){try{localStorage.setItem(NOTES_KEY,JSON.stringify(notes));}catch(e){}}
+loadNotes();
+
+let _noteTimer=null;
+function autoSaveNote(){
+  clearTimeout(_noteTimer);
+  _noteTimer=setTimeout(saveNote,800);
+}
+function saveNote(){
+  const w=words[detailWordIdx];if(!w)return;
+  const txt=document.getElementById('wd-notes')?.value||'';
+  if(txt.trim())notes[w.w]=txt; else delete notes[w.w];
+  saveNotes();
+  const btn=document.getElementById('note-save-btn');
+  if(btn){btn.textContent='Saved ✓';btn.classList.add('notebook-saved');setTimeout(()=>{btn.textContent='Save note';btn.classList.remove('notebook-saved');},1500);}
+}
+
+/* ── WORD RELATIONS ── */
+let relations={};  // {word: {syn:[], ant:[]}}
+const REL_KEY='vocabbuilder_relations_v1';
+function loadRelations(){try{const s=localStorage.getItem(REL_KEY);if(s)relations=JSON.parse(s);}catch(e){relations={};}}
+function saveRelations(){try{localStorage.setItem(REL_KEY,JSON.stringify(relations));}catch(e){}}
+loadRelations();
+
+function getRelations(word){return relations[word]||{syn:[],ant:[]};}
+function addRelation(word,rel,type){
+  if(!rel.trim())return;
+  if(!relations[word])relations[word]={syn:[],ant:[]};
+  const arr=relations[word][type];
+  if(!arr.includes(rel)){arr.push(rel.trim());saveRelations();}
+}
+function removeRelation(word,rel,type){
+  if(!relations[word])return;
+  relations[word][type]=relations[word][type].filter(r=>r!==rel);
+  saveRelations();
+}
+
+function addRelFromInput(forceType){
+  const inp=document.getElementById('rel-input');if(!inp)return;
+  const val=inp.value.trim();if(!val)return;
+  const w=words[detailWordIdx];if(!w)return;
+  const type=forceType||'syn';
+  addRelation(w.w,val,type);
+  inp.value='';
+  renderRelChips(w.w);
+}
+function renderRelChips(word){
+  const rel=getRelations(word);
+  const synEl=document.getElementById('rel-syn-chips');
+  const antEl=document.getElementById('rel-ant-chips');
+  if(!synEl||!antEl)return;
+  synEl.innerHTML=rel.syn.map(r=>`<span class="rel-chip syn">${esc(r)}<span class="rel-chip-x" onclick="removeRelation('${esc(word)}','${esc(r)}','syn');renderRelChips('${esc(word)}')">×</span></span>`).join('');
+  antEl.innerHTML=rel.ant.map(r=>`<span class="rel-chip ant">${esc(r)}<span class="rel-chip-x" onclick="removeRelation('${esc(word)}','${esc(r)}','ant');renderRelChips('${esc(word)}')">×</span></span>`).join('');
+}
+
+/* ── MASTERY HEATMAP ── */
+function renderMasteryHeatmap(){
+  const el=document.getElementById('mastery-heatmap');
+  if(!el)return;
+  if(!words.length){el.innerHTML='<div style="font-size:.8rem;color:var(--ink3);font-style:italic">Add words to see the heatmap.</div>';return;}
+  el.innerHTML=words.map(w=>{
+    const m=mastery[w.w]||{c:0,a:0};
+    const pct=m.a>0?Math.round(m.c/m.a*100):-1;
+    let bg,label;
+    if(pct<0){bg='var(--bdr2)';label='Not studied';}
+    else if(pct<50){bg='var(--accent)';label=pct+'%';}
+    else if(pct<80){bg='var(--amber)';label=pct+'%';}
+    else{bg='var(--green)';label=pct+'%';}
+    return `<div class="mh-cell" style="background:${bg}" onclick="showWordDetail(${words.indexOf(w)})">
+      <div class="mh-tooltip">${esc(w.w)} — ${label}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── CLIPBOARD PASTE ── */
+let pasteSelectedWords=new Set();
+function showPastePanel(){
+  document.getElementById('paste-panel').style.display='';
+  document.getElementById('paste-results').style.display='none';
+  pasteSelectedWords.clear();
+}
+function hidePastePanel(){
+  document.getElementById('paste-panel').style.display='none';
+}
+async function triggerPasteRead(){
+  try{
+    const text=await navigator.clipboard.readText();
+    processPasteText(text);
+  }catch(e){
+    // Fallback: show prompt
+    const text=prompt('Paste your text here:');
+    if(text)processPasteText(text);
+  }
+}
+function handlePasteDrop(e){
+  e.preventDefault();
+  document.getElementById('paste-drop-zone').classList.remove('drag-over');
+  const text=e.dataTransfer.getData('text');
+  if(text)processPasteText(text);
+}
+function processPasteText(text){
+  if(!text.trim())return;
+  // Extract unique words, filter out already-added ones and common words
+  const COMMON=new Set(['the','a','an','is','are','was','were','be','been','being','have','has','had','do','does','did','will','would','could','should','may','might','must','shall','can','need','dare','used','ought','to','of','in','for','on','with','at','by','from','up','about','into','through','during','before','after','above','below','between','out','off','over','under','again','then','once','and','but','or','nor','so','yet','if','as','than','that','this','these','those','he','she','it','they','we','you','i','me','him','her','us','them','my','your','his','its','our','their','what','which','who','whom','how','when','where','why','all','both','each','few','more','most','other','some','such','no','not','only','same','very','just','because','while','although','since','unless','until','also','even','still','too','however','therefore','thus','hence']);
+  const wordList=text.match(/\b[a-zA-Z]{4,}\b/g)||[];
+  const unique=[...new Set(wordList.map(w=>w.toLowerCase()))]
+    .filter(w=>!COMMON.has(w)&&!words.find(x=>x.w.toLowerCase()===w.toLowerCase()))
+    .slice(0,40);
+  if(!unique.length){toast('No new words found in pasted text');return;}
+  pasteSelectedWords=new Set(unique);
+  const listEl=document.getElementById('paste-result-list');
+  listEl.innerHTML=unique.map(w=>`<span class="paste-word-found selected" onclick="togglePasteWord('${w}',this)">${w}</span>`).join('');
+  document.getElementById('paste-results').style.display='';
+}
+function togglePasteWord(w,el){
+  if(pasteSelectedWords.has(w)){pasteSelectedWords.delete(w);el.classList.remove('selected');}
+  else{pasteSelectedWords.add(w);el.classList.add('selected');}
+}
+async function addSelectedPasteWords(){
+  if(!pasteSelectedWords.size){toast('No words selected');return;}
+  // Use AI to get definitions for selected words
+  const wordsArr=[...pasteSelectedWords].slice(0,15);
+  toast(`Adding ${wordsArr.length} words…`);
+  let added=0;
+  // Add without definitions first, then try to fetch them
+  wordsArr.forEach(w=>{
+    if(!words.find(x=>x.w.toLowerCase()===w.toLowerCase())){
+      words.push({w:w,d:'(definition not yet set)'});added++;
+    }
+  });
+  saveWords();renderList();hidePastePanel();
+  toast(`Added ${added} words. Tap each to add definitions.`);
+  // Try to get AI definitions in background
+  fetchBatchDefinitions(wordsArr);
+}
+async function fetchBatchDefinitions(wordList){
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:400,
+        messages:[{role:'user',content:`Give very brief definitions (under 10 words each) for these words. Respond ONLY as JSON: {"word":"definition",...}\nWords: ${wordList.join(', ')}`}]
+      })
+    });
+    const data=await resp.json();
+    const text=data.content?.[0]?.text||'{}';
+    const clean=text.replace(/```json|```/g,'').trim();
+    const defs=JSON.parse(clean);
+    let updated=0;
+    Object.entries(defs).forEach(([w,d])=>{
+      const idx=words.findIndex(x=>x.w.toLowerCase()===w.toLowerCase());
+      if(idx>=0&&words[idx].d==='(definition not yet set)'){words[idx].d=d;updated++;}
+    });
+    if(updated){saveWords();renderList();toast(`✨ Definitions added for ${updated} words`);}
+  }catch(e){/* silent fail — user can add defs manually */}
+}
+
+/* ── PRINT FLASHCARDS ── */
+function printFlashcards(){
+  if(!words.length){toast('No words to print');return;}
+  const printDiv=document.getElementById('print-cards');
+  printDiv.innerHTML=`<h1 style="font-family:serif;margin-bottom:16px">Flashcards</h1>`+
+    words.map(w=>`<div class="pc-card"><span class="pc-word">${esc(w.w)}</span><span class="pc-def">${esc(w.d)}</span></div>`).join('');
+  printDiv.style.display='block';
+  window.print();
+  printDiv.style.display='none';
+}
+
+/* ── PATCHED showWordDetail — notebook + relations + speak + etymology ── */
+function showWordDetail(i){
+  detailWordIdx=i;const w=words[i];if(!w)return;
+  document.getElementById('wd-word').textContent=w.w;
+  document.getElementById('wd-def').textContent=w.d;
+  const m=mastery[w.w]||{c:0,a:0};
+  const pct=m.a>0?Math.round(m.c/m.a*100):null;
+  const stats=document.getElementById('wd-stats');
+  stats.innerHTML='';
+  // Difficulty chip
+  stats.innerHTML+=`<span class="wd-stat">${diff[w.w]?'Difficulty: '+diff[w.w]:'Not yet rated'}</span>`;
+  // Accuracy chip
+  if(m.a>0){const cls=pct>=80?'good':pct>=50?'mid':'bad';stats.innerHTML+=`<span class="wd-stat ${cls}">Accuracy: ${pct}% (${m.c}/${m.a})</span>`;}
+  else stats.innerHTML+=`<span class="wd-stat">Not yet quizzed</span>`;
+  // Tags
+  const tagNames=Object.keys(tags);
+  if(tagNames.length){
+    stats.innerHTML+='<div style="margin-top:.5rem;font-size:.72rem;color:var(--ink3)">Tags:</div>';
+    stats.innerHTML+=tagNames.map(n=>{
+      const t=tags[n];const has=t.words.includes(w.w);
+      return `<span class="tag-pill" style="background:${has?t.color:t.color+'22'};color:${has?'#fff':t.color};border-color:${t.color}" onclick="toggleWordTag('${esc(w.w)}','${esc(n)}');showWordDetail(${i})">#${esc(n)}</span>`;
+    }).join('');
+  }
+  // New tag input
+  stats.innerHTML+=`<div style="margin-top:.5rem;display:flex;gap:5px"><input class="tag-input" id="new-tag-input" placeholder="New tag…" style="height:30px;font-size:.75rem"/><button class="btn-s" style="padding:4px 10px" onclick="const v=document.getElementById('new-tag-input').value;if(v){addTag(v);toggleWordTag('${esc(w.w)}',v);showWordDetail(${i})}">+</button></div>`;
+  // Speak button
+  stats.innerHTML+=`<div style="margin-top:.6rem"><button class="pronun-btn" onclick="speakWord('${esc(w.w)}')">🔊 Hear pronunciation</button></div>`;
+  // Etymology button
+  stats.innerHTML+=`<div style="margin-top:.4rem"><button class="ai-btn" id="etym-btn" onclick="loadEtymology()">🌿 Etymology</button><div class="etymology-row" id="etym-box" style="display:none"><div class="etym-label">Etymology</div><div class="etym-text"></div></div></div>`;
+  // Load notebook note
+  const notesEl=document.getElementById('wd-notes');
+  if(notesEl)notesEl.value=notes[w.w]||'';
+  const btn=document.getElementById('note-save-btn');
+  if(btn){btn.textContent='Save note';btn.classList.remove('notebook-saved');}
+  // Load relations
+  renderRelChips(w.w);
+  // AI fields
+  document.getElementById('wd-ai-sentence').textContent='';
+  document.getElementById('wd-ai-sentence').classList.remove('show');
+  document.getElementById('wd-ai-btn').textContent='✨ Example sentence';
+  document.getElementById('wd-ai-btn').disabled=false;
+  document.getElementById('word-detail-modal').classList.add('show');
+}
+
+/* ── PATCH refreshProgressUI to render heatmap ── */
+function refreshProgressUI(){
+  const badge=document.getElementById('plc-badge');
+  if(!badge)return;
+  const acc=P.totalAnswered>0?Math.round(P.totalCorrect/P.totalAnswered*100):0;
+  const s=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  s('st-quizzes',P.quizzesTaken);
+  s('st-correct',P.totalCorrect);
+  s('st-streak',P.bestStreak);
+  s('st-cards',P.cardsStudied);
+  s('st-acc',acc+'%');
+  s('st-days',P.dayStreak);
+  renderCalendar();
+  renderScoreChart();
+  renderAchievements();
+  renderWeakWords();
+  renderReviewQueue();
+  renderScoreHistoryTable();
+  renderMasteryHeatmap();
+}
+
+/* ── SWIPE GESTURES ON FLASHCARD ── */
+let _touchStartX=0,_touchStartY=0;
+document.addEventListener('touchstart',e=>{
+  const fc=document.getElementById('fc-inner');
+  if(!fc)return;
+  if(!fc.closest('.panel.active'))return;
+  _touchStartX=e.touches[0].clientX;
+  _touchStartY=e.touches[0].clientY;
+},{passive:true});
+document.addEventListener('touchend',e=>{
+  const fc=document.getElementById('fc-inner');
+  if(!fc)return;
+  if(!fc.closest('.panel.active'))return;
+  const dx=e.changedTouches[0].clientX-_touchStartX;
+  const dy=e.changedTouches[0].clientY-_touchStartY;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>40){
+    if(dx>0)fcMove(-1); else fcMove(1);
+  }
+},{passive:true});
+
+/* ── ANIMATED LEVEL BADGE PULSE ── */
+function triggerLevelUp(lvl){}  // removed
+
+/* ── INIT ── */
+renderList();initWotd();initDailyChallenge();
+if(P.dayStreak>0){const sh=document.getElementById('streak-hdr');if(sh){sh.style.display='flex';document.getElementById('streak-n').textContent=P.dayStreak;}}
+
+</script>
+</body>
+</html>
