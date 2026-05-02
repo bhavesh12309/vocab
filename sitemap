@@ -6,7 +6,7 @@
 
   <!-- Main app -->
   <url>
-    <loc>https://yourdomain.com/</loc>
+    <loc>https://vocab.com/</loc>
     <lastmod>2026-05-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
@@ -14,7 +14,7 @@
 
   <!-- Words tab -->
   <url>
-    <loc>https://yourdomain.com/#words</loc>
+    <loc>https://vocab.com/#words</loc>
     <lastmod>2026-05-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -22,7 +22,7 @@
 
   <!-- Flashcards tab -->
   <url>
-    <loc>https://yourdomain.com/#cards</loc>
+    <loc>https://vocab.com/#cards</loc>
     <lastmod>2026-05-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -30,7 +30,7 @@
 
   <!-- Quiz tab -->
   <url>
-    <loc>https://yourdomain.com/#quiz</loc>
+    <loc>https://vocab.com/#quiz</loc>
     <lastmod>2026-05-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -38,7 +38,7 @@
 
   <!-- Match game tab -->
   <url>
-    <loc>https://yourdomain.com/#match</loc>
+    <loc>https://vocab.com/#match</loc>
     <lastmod>2026-05-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -46,7 +46,7 @@
 
   <!-- Stats tab -->
   <url>
-    <loc>https://yourdomain.com/#stats</loc>
+    <loc>https://vocab.com/#stats</loc>
     <lastmod>2026-05-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -54,7 +54,7 @@
 
   <!-- Settings tab -->
   <url>
-    <loc>https://yourdomain.com/#settings</loc>
+    <loc>https://vocab.com/#settings</loc>
     <lastmod>2026-05-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
